@@ -26,58 +26,64 @@ import "./styles.css";
 
 const modules = [
   {
-    title: "Dein Fundament",
+    title: "Idee",
+    subtitle: "Das Fundament",
     label: "Modul 1",
-    progress: 80,
-    lessonsText: "12 Lektionen",
+    progress: 50,
+    lessonsText: "2 Lektionen",
     photo: "desk",
-    description: "Lege die Basis fuer deine kreative Positionierung und klare Wochenstruktur.",
-    lessons: ["Deine Vision & Ziele", "Deine Zielgruppe", "Positionierung", "Deine Botschaft", "Zusammenfassung"],
+    description: "Orientierung schaffen, Ordnung anlegen und eine erste Richtung fuer dein Projekt festlegen.",
+    lessons: ["Was wir hier wirklich bauen", "Deinen Werkzeugkasten auspacken"],
   },
   {
-    title: "Dein Angebot",
+    title: "Inhalt",
+    subtitle: "Der Kern",
     label: "Modul 2",
-    progress: 60,
-    lessonsText: "10 Lektionen",
+    progress: 0,
+    lessonsText: "In Planung",
     photo: "candles",
-    description: "Forme aus deiner Idee ein Angebot, das sich leicht erklaeren und verkaufen laesst.",
-    lessons: ["Angebotskern", "Promise & Ergebnis", "Preisstruktur", "Launch-Check", "Workbook"],
+    description: "Hier entsteht der inhaltliche Kern deines Buchprojekts.",
+    lessons: ["Inhalt strukturieren", "Kapitelgeruest anlegen", "Rohfassung vorbereiten"],
   },
   {
-    title: "Deine Sichtbarkeit",
+    title: "Canva-Dateien",
+    subtitle: "Das Design",
     label: "Modul 3",
-    progress: 45,
-    lessonsText: "8 Lektionen",
+    progress: 0,
+    lessonsText: "In Planung",
     photo: "tablet",
-    description: "Plane Content, der warm wirkt und trotzdem strategisch auf dein Ziel einzahlt.",
-    lessons: ["Content-Saeulen", "Instagram-Rhythmus", "Storytelling", "Call to Action", "Redaktionsplan"],
+    description: "Aus deinem Inhalt werden Canva-Dateien und ein klares Buchdesign.",
+    lessons: ["Canva-Datei vorbereiten", "Layout-System verstehen", "Design finalisieren"],
   },
   {
-    title: "Deine Produkte",
+    title: "Qualitaetscheck",
+    subtitle: "Der Feinschliff",
     label: "Modul 4",
     progress: 0,
-    lessonsText: "6 Lektionen",
+    lessonsText: "In Planung",
     photo: "journal",
-    description: "Baue digitale Produkte, Vorlagen und Ressourcen fuer deinen Kurskosmos.",
-    lessons: ["Produktidee", "Struktur", "Materialien", "Pricing", "Upload"],
+    description: "Wir pruefen dein Ergebnis, schleifen Details nach und sichern die Qualitaet.",
+    lessons: ["Checkliste durchgehen", "Feinschliff planen", "Finale Datei sichern"],
   },
   {
-    title: "Verkauf & Marketing",
+    title: "KDP-Upload-Plan",
+    subtitle: "Die Technik",
     label: "Modul 5",
     progress: 0,
-    lessonsText: "6 Lektionen",
+    lessonsText: "In Planung",
     photo: "laptop",
-    description: "Erstelle eine Verkaufsseite, E-Mail-Sequenz und klare Kundenreise.",
-    lessons: ["Sales Page", "E-Mail Flow", "Einwandarbeit", "Checkout", "Analyse"],
+    description: "Der technische Plan fuer Upload, Dateien und die naechsten KDP-Schritte.",
+    lessons: ["Upload vorbereiten", "Dateien pruefen", "KDP-Schritte planen"],
   },
   {
-    title: "Automation & Tools",
+    title: "Marketingstart",
+    subtitle: "Der Launch",
     label: "Modul 6",
     progress: 0,
-    lessonsText: "7 Lektionen",
+    lessonsText: "In Planung",
     photo: "studio",
-    description: "Verbinde Tools, Vorlagen und Automationen fuer ein leichteres Kurssystem.",
-    lessons: ["Toolstack", "Zapier Basics", "Memberbereich", "Tracking", "Launch-Board"],
+    description: "Der Startpunkt fuer deine Sichtbarkeit und den Launch deines Buchprojekts.",
+    lessons: ["Launch vorbereiten", "Marketingstart planen", "Naechsten Schritt sichern"],
   },
 ];
 
@@ -110,7 +116,7 @@ function App() {
   const stats = useMemo(
     () => [
       ["8", "Module", BookOpen],
-      ["24", "Lektionen", FileText],
+      ["17", "Lektionen", FileText],
       ["12h", "Lernzeit", Clock3],
       ["65%", "Fortschritt", Sparkles],
     ],
@@ -218,7 +224,7 @@ function Dashboard({ stats, setPage, openModule }) {
         </div>
         <button className="primary" onClick={() => openModule(0, 1)}><Play size={17} /> Weiterlernen</button>
       </div>
-      <div className="stats">{stats.map(([n, l, Icon]) => <Glass key={l}><Icon /><strong>{n}</strong><span>{l}</span></Glass>)}</div>
+      <div className="stats">{stats.map(([n, l, Icon]) => <Glass key={l}><Icon /><strong>{l === "Module" ? modules.length : n}</strong><span>{l}</span></Glass>)}</div>
       <SectionTitle title="Deine Module" action="Alle anzeigen" onClick={() => setPage("Classroom")} />
       <div className="module-grid">{modules.map((m, i) => <ModuleCard key={m.title} data={m} onClick={() => openModule(i)} />)}</div>
       <div className="split">
@@ -241,6 +247,7 @@ function Classroom({ activeModule, activeLesson, setActiveModule, setActiveLesso
           <div className={`photo ${selected.photo}`}><button aria-label="Lektion starten"><Play fill="currentColor" /></button></div>
           <span className="lesson-kicker">{selected.label} / Lektion {activeLesson + 1}</span>
           <h2>{lesson}</h2>
+          <strong className="module-subtitle">{selected.title} - {selected.subtitle}</strong>
           <p>{selected.description}</p>
           <div className="lesson-actions">
             <button className="outline" onClick={completeLesson}><Check size={16} /> Als abgeschlossen markieren</button>
@@ -311,6 +318,7 @@ function ModuleCard({ data, selected, onClick }) {
       <div className={`photo ${data.photo}`} />
       <span>{data.label}</span>
       <strong>{data.title}</strong>
+      <em>{data.subtitle}</em>
       <div className="bar"><i style={{ width: `${data.progress}%` }} /></div>
       <small>{data.lessonsText}<b>{data.progress}%</b></small>
     </button>
