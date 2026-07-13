@@ -21,6 +21,7 @@ import {
   Star,
   Upload,
   Users,
+  X,
 } from "lucide-react";
 import "./styles.css";
 
@@ -113,6 +114,7 @@ function App() {
   const [activeLesson, setActiveLesson] = useState(0);
   const [query, setQuery] = useState("");
   const [drawer, setDrawer] = useState(null);
+  const [toast, setToast] = useState("");
   const stats = useMemo(
     () => [
       ["8", "Module", BookOpen],
@@ -138,13 +140,24 @@ function App() {
     setDrawer(null);
   }
 
+  function notify(message) {
+    setToast(message);
+    window.clearTimeout(notify.timer);
+    notify.timer = window.setTimeout(() => setToast(""), 2600);
+  }
+
+  function goToPage(nextPage) {
+    setPage(nextPage);
+    setDrawer(null);
+  }
+
   return (
     <main className="app-shell" data-version="pages-fix-1">
       <aside className="sidebar">
-        <button className="brand" onClick={() => setPage("Uebersicht")}>KREA-MIX<span>*</span></button>
+        <button className="brand" onClick={() => goToPage("Uebersicht")}>KREA-MIX<span>*</span></button>
         <nav>
           {nav.map(([label, Icon]) => (
-            <button className={page === label ? "active" : ""} onClick={() => setPage(label)} key={label}>
+            <button className={page === label ? "active" : ""} onClick={() => goToPage(label)} key={label}>
               <Icon size={18} />
               <span>{label}</span>
             </button>
@@ -175,7 +188,7 @@ function App() {
           </label>
           <div className="top-tabs">
             {pages.slice(0, 5).map((item) => (
-              <button className={page === item ? "active" : ""} onClick={() => setPage(item)} key={item}>{item}</button>
+              <button className={page === item ? "active" : ""} onClick={() => goToPage(item)} key={item}>{item}</button>
             ))}
           </div>
           <div className="top-actions">
@@ -183,23 +196,24 @@ function App() {
             <button aria-label="Nachrichten" onClick={() => setDrawer(drawer === "messages" ? null : "messages")}><MessageCircle size={18} /></button>
             <button className="avatar" aria-label="Profil" onClick={() => setDrawer(drawer === "profile" ? null : "profile")}>K</button>
           </div>
-          {drawer && <TopDrawer type={drawer} setPage={setPage} />}
+          {drawer && <TopDrawer type={drawer} setPage={goToPage} notify={notify} />}
         </header>
 
-        {page === "Uebersicht" && <Dashboard stats={stats} setPage={setPage} openModule={openModule} />}
+        {page === "Uebersicht" && <Dashboard stats={stats} setPage={goToPage} openModule={openModule} />}
         {page === "Classroom" && <Classroom activeModule={activeModule} activeLesson={activeLesson} setActiveModule={setActiveModule} setActiveLesson={setActiveLesson} />}
-        {page === "Community" && <Community />}
+        {page === "Community" && <Community notify={notify} />}
         {page === "Mitglieder" && <Members />}
         {page === "Kalender" && <CalendarPage />}
-        {page === "Ressourcen" && <Resources />}
+        {page === "Ressourcen" && <Resources notify={notify} />}
         {page === "Favoriten" && <Favorites openModule={openModule} />}
-        {page === "Einstellungen" && <SettingsPage />}
+        {page === "Einstellungen" && <SettingsPage notify={notify} />}
+        {toast && <div className="toast">{toast}</div>}
       </section>
     </main>
   );
 }
 
-function TopDrawer({ type, setPage }) {
+function TopDrawer({ type, setPage, notify }) {
   const content = {
     notice: ["Live-Q&A beginnt heute um 19:00", "Neue Workbook-Vorlage ist verfuegbar", "Anna hat deinen Beitrag kommentiert"],
     messages: ["Sophie: Danke fuer deine Frage!", "Laura: Ich habe dir die Vorlage geteilt", "Team KREA: Willkommen im Kurs"],
@@ -208,7 +222,15 @@ function TopDrawer({ type, setPage }) {
   return (
     <div className="top-drawer">
       {content.map((item) => (
-        <button key={item} onClick={() => item.includes("Einstellungen") && setPage("Einstellungen")}>{item}</button>
+        <button
+          key={item}
+          onClick={() => {
+            if (item.includes("Einstellungen")) setPage("Einstellungen");
+            else notify(item);
+          }}
+        >
+          {item}
+        </button>
       ))}
     </div>
   );
@@ -281,8 +303,30 @@ function Classroom({ activeModule, activeLesson, setActiveModule, setActiveLesso
   );
 }
 
-function Community() {
-  return <div className="page"><SectionTitle title="Community" action="Neuer Beitrag" /><div className="feed">{posts.map((p) => <Post key={p[0]} post={p} />)}</div></div>;
+function Community({ notify }) {
+  const [composerOpen, setComposerOpen] = useState(false);
+  return (
+    <div className="page">
+      <SectionTitle title="Community" action="Neuer Beitrag" onClick={() => setComposerOpen(true)} />
+      {composerOpen && (
+        <div className="composer">
+          <button className="composer-close" aria-label="Beitrag schliessen" onClick={() => setComposerOpen(false)}><X size={16} /></button>
+          <strong>Neuer Beitrag</strong>
+          <textarea placeholder="Was moechtest du mit der Community teilen?" />
+          <button
+            className="primary"
+            onClick={() => {
+              setComposerOpen(false);
+              notify("Beitrag als Entwurf angelegt.");
+            }}
+          >
+            Entwurf speichern
+          </button>
+        </div>
+      )}
+      <div className="feed">{posts.map((p) => <Post key={p[0]} post={p} />)}</div>
+    </div>
+  );
 }
 
 function Members() {
@@ -293,16 +337,16 @@ function CalendarPage() {
   return <div className="page calendar-page"><SectionTitle title="Kalender" action="Monat" /><CalendarBlock /><Panel title="Deine naechsten Events"><Agenda /></Panel></div>;
 }
 
-function Resources() {
-  return <div className="page"><SectionTitle title="Ressourcen" action={<><Upload size={15} /> Upload</>} /><div className="resource-grid">{["Checkliste: Kreativer Monatsplan", "Tutorial: Canva fuer Anfaenger", "Workbook: Markenwerte", "Vorlagen-Paket Branding"].map((r, i) => <Glass key={r}><FileText /><strong>{r}</strong><span>{i % 2 ? "Video - 18 Min." : "PDF - 1.3 MB"}</span></Glass>)}</div></div>;
+function Resources({ notify }) {
+  return <div className="page"><SectionTitle title="Ressourcen" action={<><Upload size={15} /> Upload</>} onClick={() => notify("Upload-Bereich vorbereitet.")} /><div className="resource-grid">{["Checkliste: Kreativer Monatsplan", "Tutorial: Canva fuer Anfaenger", "Workbook: Markenwerte", "Vorlagen-Paket Branding"].map((r, i) => <Glass key={r}><FileText /><strong>{r}</strong><span>{i % 2 ? "Video - 18 Min." : "PDF - 1.3 MB"}</span></Glass>)}</div></div>;
 }
 
 function Favorites({ openModule }) {
   return <div className="page"><SectionTitle title="Favoriten" action="Sortieren" /><div className="module-grid">{modules.slice(0, 3).map((m, i) => <ModuleCard key={m.title} data={m} onClick={() => openModule(i)} />)}</div></div>;
 }
 
-function SettingsPage() {
-  return <div className="page settings-page"><SectionTitle title="Einstellungen" action="Speichern" /><Panel title="Profil"><input defaultValue="Klaus" /><input defaultValue="klaus@example.com" /><button className="primary">Aenderungen speichern</button></Panel></div>;
+function SettingsPage({ notify }) {
+  return <div className="page settings-page"><SectionTitle title="Einstellungen" action="Speichern" onClick={() => notify("Einstellungen gespeichert.")} /><Panel title="Profil"><input defaultValue="Klaus" /><input defaultValue="klaus@example.com" /><button className="primary" onClick={() => notify("Profil gespeichert.")}>Aenderungen speichern</button></Panel></div>;
 }
 
 function SectionTitle({ title, action, onClick }) {
