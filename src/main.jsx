@@ -133,7 +133,7 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" data-version="pages-fix-1">
       <aside className="sidebar">
         <button className="brand" onClick={() => setPage("Uebersicht")}>KREA-MIX<span>*</span></button>
         <nav>
