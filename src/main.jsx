@@ -35,7 +35,7 @@ import referenceDashboard from "./assets/reference-dashboard.png";
 import referenceHero from "./assets/reference-hero.png";
 import referenceMembers from "./assets/reference-members.png";
 
-const moduleImageFiles = import.meta.glob("./assets/modules/module-*.webp", {
+const moduleImageFiles = import.meta.glob("./assets/modules/module-*.jpg", {
   eager: true,
   query: "?url",
   import: "default",
@@ -428,8 +428,8 @@ function getPhaseForModule(moduleIndex) {
 
 const modules = baseModules.map((module, index) => {
   const phase = getPhaseForModule(index);
-  const moduleNumber = String(index + 1).padStart(2, "0");
-  const imageSrc = moduleImageFiles[`./assets/modules/module-${moduleNumber}.webp`] || null;
+  const moduleNumber = String(index + 1);
+  const imageSrc = moduleImageFiles[`./assets/modules/module-${moduleNumber}.jpg`] || null;
   const [displayTitle, displaySubtitle] = moduleDisplayOverrides[index] || module.title.split(": ");
   return {
     ...module,
@@ -439,7 +439,7 @@ const modules = baseModules.map((module, index) => {
     displaySubtitle: displaySubtitle || module.subtitle,
     result: module.description,
     imageSrc,
-    imageName: `module-${moduleNumber}.webp`,
+    imageName: `module-${moduleNumber}.jpg`,
   };
 });
 
