@@ -107,6 +107,7 @@ const posts = [
 const members = ["Sophie L.", "Lena K.", "Marie B.", "Tanja W.", "Lisa M."];
 const pages = ["Uebersicht", "Classroom", "Community", "Mitglieder", "Kalender", "Ressourcen", "Favoriten", "Einstellungen"];
 const adminPin = "KREA";
+const lessonVideoUrl = "https://www.canva.com/design/DAHPMZTSUlE/r0v8jt63fj2HFg9mz6rTNQ/edit";
 
 const nav = [
   ["Uebersicht", Home],
@@ -606,7 +607,11 @@ function Classroom({ activeModule, activeLesson, setActiveModule, setActiveLesso
       <SectionTitle title="Classroom" action={`${selected.label} wechseln`} />
       <div className="lesson-layout">
         <div className="video-card">
-          <div className={`photo ${selected.photo}`}><button aria-label="Lektion starten"><Play fill="currentColor" /></button></div>
+          <div className={`photo ${selected.photo}`}>
+            <a href={lessonVideoUrl} target="_blank" rel="noopener noreferrer" aria-label="Lektion in Canva oeffnen">
+              <Play fill="currentColor" />
+            </a>
+          </div>
           <span className="lesson-kicker">{selected.label} / Lektion {activeLesson + 1}</span>
           <h2>{lesson}</h2>
           {selected.subtitle && <strong className="module-subtitle">{selected.subtitle}</strong>}
