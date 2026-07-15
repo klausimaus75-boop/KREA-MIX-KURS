@@ -3,4 +3,5 @@ dist/
 *.png
 !src/assets/*.png
 !assets/*.png
+!src/assets/modules/*.webp
 .DS_Store
