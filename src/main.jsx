@@ -349,17 +349,17 @@ const courseProgress = Math.round(modules.reduce((sum, module) => sum + module.p
 
 const posts = [
   ["Anna M.", "Mein erster Erfolg mit Modul 2!", "Ich konnte mein erstes Angebot sichtbar machen und bin so happy.", 24, 8],
-  ["Julia P.", "Frage zu Canva Vorlagen", "Hat jemand eine Empfehlung fuer schoene Vorlagen fuer Workbook?", 19, 12],
-  ["Laura K.", "Neue Datei geteilt", "Kundenavatar-Vorlage fuer die Positionierung.", 16, 4],
+  ["Julia P.", "Frage zu Canva Vorlagen", "Hat jemand eine Empfehlung für schöne Vorlagen für Workbook?", 19, 12],
+  ["Laura K.", "Neue Datei geteilt", "Kundenavatar-Vorlage für die Positionierung.", 16, 4],
 ];
 
 const members = ["Sophie L.", "Lena K.", "Marie B.", "Tanja W.", "Lisa M."];
-const pages = ["Uebersicht", "Classroom", "Community", "Mitglieder", "Kalender", "Ressourcen", "Favoriten", "Einstellungen"];
+const pages = ["Übersicht", "Classroom", "Community", "Mitglieder", "Kalender", "Ressourcen", "Favoriten", "Einstellungen"];
 const adminPin = "KREA";
 const lessonVideoUrl = "https://www.canva.com/design/DAHPMZTSUlE/r0v8jt63fj2HFg9mz6rTNQ/edit";
 
 const nav = [
-  ["Uebersicht", Home],
+  ["Übersicht", Home],
   ["Classroom", BookOpen],
   ["Community", Users],
   ["Mitglieder", Users],
@@ -370,7 +370,7 @@ const nav = [
 ];
 
 function App() {
-  const [page, setPage] = useState(() => (window.location.hash === "#admin" ? "Admin" : "Uebersicht"));
+  const [page, setPage] = useState(() => (window.location.hash === "#admin" ? "Admin" : "Übersicht"));
   const [activeModule, setActiveModule] = useState(0);
   const [activeLesson, setActiveLesson] = useState(0);
   const [query, setQuery] = useState("");
@@ -454,7 +454,7 @@ function App() {
     );
   }
 
-  if (page === "Uebersicht") {
+  if (page === "Übersicht") {
     return (
       <>
         <LandingPage setPage={goToPage} openModule={openModule} />
@@ -466,7 +466,7 @@ function App() {
   return (
     <main className="app-shell" data-version="pages-fix-1">
       <aside className="sidebar">
-        <button className="brand" onClick={() => goToPage("Uebersicht")}>KREA-MIX<span>*</span></button>
+        <button className="brand" onClick={() => goToPage("Übersicht")}>KREA-MIX<span>*</span></button>
         <nav>
           {nav.map(([label, Icon]) => (
             <button className={page === label ? "active" : ""} onClick={() => goToPage(label)} key={label}>
@@ -478,7 +478,7 @@ function App() {
         <div className="progress-orb">
           <p>Dein Fortschritt</p>
           <div className="ring" style={{ "--progress": `${courseProgress}%` }}><strong>{courseProgress}%</strong></div>
-          <span>Weiter so! Du bist grossartig.</span>
+          <span>Weiter so! Du bist großartig.</span>
         </div>
       </aside>
 
@@ -526,7 +526,7 @@ function App() {
 
 function LandingPage({ setPage, openModule }) {
   const features = [
-    [BookOpen, "Strukturierte Module", "Alles Schritt fuer Schritt erklaert", () => setPage("Classroom")],
+    [BookOpen, "Strukturierte Module", "Alles Schritt für Schritt erklärt", () => setPage("Classroom")],
     [Users, "Community", "Tausche dich mit anderen aus", () => setPage("Community")],
     [CalendarDays, "Flexibel lernen", "Lerne wann und wo du willst", () => setPage("Kalender")],
     [Star, "Praxis & Ergebnisse", "Weniger Theorie, mehr Umsetzung", () => openModule(0)],
@@ -535,11 +535,11 @@ function LandingPage({ setPage, openModule }) {
   return (
     <main className="landing-page" aria-label="KREA-MIX Landingpage">
       <header className="landing-header">
-        <button className="landing-brand" onClick={() => setPage("Uebersicht")}>KREA-MIX<span>*</span></button>
+        <button className="landing-brand" onClick={() => setPage("Übersicht")}>KREA-MIX<span>*</span></button>
         <nav className="landing-nav" aria-label="Landing Navigation">
-          <button onClick={() => openModule(0)}>Ueber den Kurs</button>
+          <button onClick={() => openModule(0)}>Über den Kurs</button>
           <button onClick={() => setPage("Classroom")}>Inhalte</button>
-          <button onClick={() => setPage("Community")}>Fuer wen?</button>
+          <button onClick={() => setPage("Community")}>Für wen?</button>
           <button onClick={() => setPage("Mitglieder")}>Vorteile</button>
           <button onClick={() => setPage("Ressourcen")}>FAQ</button>
         </nav>
@@ -598,7 +598,7 @@ function DesignBoard({ setPage, openModule }) {
 
       <section className="reference-panel reference-dashboard" aria-label="KREA-MIX Dashboard">
         <img src={referenceDashboard} alt="" />
-        <button className="hotspot nav-overview" onClick={() => setPage("Uebersicht")} aria-label="Uebersicht" />
+        <button className="hotspot nav-overview" onClick={() => setPage("Übersicht")} aria-label="Übersicht" />
         <button className="hotspot nav-classroom" onClick={() => setPage("Classroom")} aria-label="Classroom" />
         <button className="hotspot nav-community" onClick={() => setPage("Community")} aria-label="Community" />
         <button className="hotspot nav-members" onClick={() => setPage("Mitglieder")} aria-label="Mitglieder" />
@@ -653,11 +653,11 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
     return (
       <main className="admin-gate">
         <section className="admin-login-card">
-          <button className="admin-back" onClick={() => goToPage("Uebersicht")}><ChevronLeft size={16} /> Zur Landingpage</button>
+          <button className="admin-back" onClick={() => goToPage("Übersicht")}><ChevronLeft size={16} /> Zur Landingpage</button>
           <div className="admin-lock"><Lock size={34} /></div>
           <span>KREA-MIX Admin</span>
           <h1>Gesch{"\u00fct"}zter Verwaltungsbereich</h1>
-          <p>Dies ist die visuelle Vorschau fuer deinen spaeter echten Admin-Account. Der Bereich ist nicht in der normalen Navigation sichtbar.</p>
+          <p>Dies ist die visuelle Vorschau für deinen später echten Admin-Account. Der Bereich ist nicht in der normalen Navigation sichtbar.</p>
           <form onSubmit={submitPin}>
             <input value={pin} onChange={(event) => setPin(event.target.value)} placeholder="Preview-PIN eingeben" />
             <button className="admin-primary">Adminbereich ansehen</button>
@@ -673,7 +673,7 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
   return (
     <main className="admin-shell">
       <aside className="admin-sidebar">
-        <button className="admin-brand" onClick={() => goToPage("Uebersicht")}>KREA-MIX<span>*</span></button>
+        <button className="admin-brand" onClick={() => goToPage("Übersicht")}>KREA-MIX<span>*</span></button>
         <div className="admin-owner">
           <UserCog size={18} />
           <div className="avatar">K</div>
@@ -687,7 +687,7 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
             <button className={index === 0 ? "active" : ""} key={item}>{item}</button>
           ))}
         </nav>
-        <button className="admin-exit" onClick={() => goToPage("Uebersicht")}><ChevronLeft size={16} /> Zur Webseite</button>
+        <button className="admin-exit" onClick={() => goToPage("Übersicht")}><ChevronLeft size={16} /> Zur Webseite</button>
       </aside>
 
       <section className="admin-workspace">
@@ -698,7 +698,7 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
           </div>
           <div className="admin-top-actions">
             <button onClick={() => notify("Entwurfsansicht vorbereitet.")}><Play size={17} /> Vorschau</button>
-            <button className="admin-primary" onClick={() => notify("Aenderungen lokal gespeichert.")}><Check size={17} /> Speichern</button>
+            <button className="admin-primary" onClick={() => notify("Änderungen lokal gespeichert.")}><Check size={17} /> Speichern</button>
           </div>
         </header>
 
@@ -756,7 +756,7 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
                 <strong>Ver{"\u00f6"}ffentlicht</strong>
                 <span>{published[selectedModule] ? "Teilnehmerinnen sehen dieses Modul." : "Nur Admin-Vorschau."}</span>
               </div>
-              <button className={published[selectedModule] ? "toggle on" : "toggle"} onClick={() => togglePublished(selectedModule)} aria-label="Modul veroeffentlichen" />
+              <button className={published[selectedModule] ? "toggle on" : "toggle"} onClick={() => togglePublished(selectedModule)} aria-label="Modul veröffentlichen" />
             </div>
             <button className="admin-wide-button" onClick={() => notify("Lektionseditor vorbereitet.")}>Lektionen bearbeiten</button>
           </div>
@@ -765,7 +765,7 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
             <div className="admin-panel-head">
               <div>
                 <span>Mitglieder</span>
-                <h2>Neueste Aktivitaet</h2>
+                <h2>Neueste Aktivität</h2>
               </div>
             </div>
             <div className="admin-member-list">
@@ -790,14 +790,14 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
               </div>
             </div>
             <div className="admin-check-list">
-              {["Neue Kommentare pruefen", "Workbook Uploads kontrollieren", "Live-Q&A Termin veroeffentlichen"].map((item) => (
+              {["Neue Kommentare prüfen", "Workbook Uploads kontrollieren", "Live-Q&A Termin veröffentlichen"].map((item) => (
                 <label key={item}><input type="checkbox" /> {item}</label>
               ))}
             </div>
             <div className="admin-toggle-row">
               <div>
                 <strong>Wartungsmodus</strong>
-                <span>Nur als UI-Preview, spaeter mit Backend.</span>
+                <span>Nur als UI-Preview, später mit Backend.</span>
               </div>
               <button className={maintenanceMode ? "toggle on" : "toggle"} onClick={() => setMaintenanceMode(!maintenanceMode)} aria-label="Wartungsmodus" />
             </div>
@@ -810,8 +810,8 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
 
 function TopDrawer({ type, setPage, notify }) {
   const content = {
-    notice: ["Live-Q&A beginnt heute um 19:00", "Neue Workbook-Vorlage ist verfuegbar", "Anna hat deinen Beitrag kommentiert"],
-    messages: ["Sophie: Danke fuer deine Frage!", "Laura: Ich habe dir die Vorlage geteilt", "Team KREA: Willkommen im Kurs"],
+    notice: ["Live-Q&A beginnt heute um 19:00", "Neue Workbook-Vorlage ist verfügbar", "Anna hat deinen Beitrag kommentiert"],
+    messages: ["Sophie: Danke für deine Frage!", "Laura: Ich habe dir die Vorlage geteilt", "Team KREA: Willkommen im Kurs"],
     profile: ["Profil bearbeiten", "Mein Fortschritt", "Einstellungen"],
   }[type];
   return (
@@ -857,7 +857,7 @@ function Classroom({ activeModule, activeLesson, setActiveModule, setActiveLesso
       <div className="lesson-layout">
         <div className="video-card">
           <div className={`photo ${selected.photo}`}>
-            <a href={lessonVideoUrl} target="_blank" rel="noopener noreferrer" aria-label="Lektion in Canva oeffnen">
+            <a href={lessonVideoUrl} target="_blank" rel="noopener noreferrer" aria-label="Lektion in Canva öffnen">
               <Play fill="currentColor" />
             </a>
           </div>
@@ -867,7 +867,7 @@ function Classroom({ activeModule, activeLesson, setActiveModule, setActiveLesso
           <p>{selected.description}</p>
           <div className="lesson-actions">
             <button className="outline" onClick={completeLesson}><Check size={16} /> Als abgeschlossen markieren</button>
-            <button className="outline"><FileText size={16} /> Workbook oeffnen</button>
+            <button className="outline"><FileText size={16} /> Workbook öffnen</button>
           </div>
         </div>
         <aside className="lesson-list">
@@ -906,7 +906,7 @@ function Community({ notify }) {
         <div className="composer">
           <button className="composer-close" aria-label="Beitrag schliessen" onClick={() => setComposerOpen(false)}><X size={16} /></button>
           <strong>Neuer Beitrag</strong>
-          <textarea placeholder="Was moechtest du mit der Community teilen?" />
+          <textarea placeholder="Was möchtest du mit der Community teilen?" />
           <button
             className="primary"
             onClick={() => {
@@ -928,11 +928,11 @@ function Members() {
 }
 
 function CalendarPage() {
-  return <div className="page calendar-page"><SectionTitle title="Kalender" action="Monat" /><CalendarBlock /><Panel title="Deine naechsten Events"><Agenda /></Panel></div>;
+  return <div className="page calendar-page"><SectionTitle title="Kalender" action="Monat" /><CalendarBlock /><Panel title="Deine nächsten Events"><Agenda /></Panel></div>;
 }
 
 function Resources({ notify }) {
-  return <div className="page"><SectionTitle title="Ressourcen" action={<><Upload size={15} /> Upload</>} onClick={() => notify("Upload-Bereich vorbereitet.")} /><div className="resource-grid">{["Checkliste: Kreativer Monatsplan", "Tutorial: Canva fuer Anfaenger", "Workbook: Markenwerte", "Vorlagen-Paket Branding"].map((r, i) => <Glass key={r}><FileText /><strong>{r}</strong><span>{i % 2 ? "Video - 18 Min." : "PDF - 1.3 MB"}</span></Glass>)}</div></div>;
+  return <div className="page"><SectionTitle title="Ressourcen" action={<><Upload size={15} /> Upload</>} onClick={() => notify("Upload-Bereich vorbereitet.")} /><div className="resource-grid">{["Checkliste: Kreativer Monatsplan", "Tutorial: Canva für Anfänger", "Workbook: Markenwerte", "Vorlagen-Paket Branding"].map((r, i) => <Glass key={r}><FileText /><strong>{r}</strong><span>{i % 2 ? "Video - 18 Min." : "PDF - 1.3 MB"}</span></Glass>)}</div></div>;
 }
 
 function Favorites({ openModule }) {
@@ -940,7 +940,7 @@ function Favorites({ openModule }) {
 }
 
 function SettingsPage({ notify }) {
-  return <div className="page settings-page"><SectionTitle title="Einstellungen" action="Speichern" onClick={() => notify("Einstellungen gespeichert.")} /><Panel title="Profil"><input defaultValue="Klaus" /><input defaultValue="klaus@example.com" /><button className="primary" onClick={() => notify("Profil gespeichert.")}>Aenderungen speichern</button></Panel></div>;
+  return <div className="page settings-page"><SectionTitle title="Einstellungen" action="Speichern" onClick={() => notify("Einstellungen gespeichert.")} /><Panel title="Profil"><input defaultValue="Klaus" /><input defaultValue="klaus@example.com" /><button className="primary" onClick={() => notify("Profil gespeichert.")}>Änderungen speichern</button></Panel></div>;
 }
 
 function SectionTitle({ title, action, onClick }) {
