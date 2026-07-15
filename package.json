@@ -1,10 +1,13 @@
 {
   "scripts": {
+    "predev": "node scripts/prepare-build.mjs",
     "dev": "vite --host 127.0.0.1",
+    "prebuild": "node scripts/prepare-build.mjs",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.110.6",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
     "react": "latest",

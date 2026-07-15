@@ -8,10 +8,14 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
+  Cloud,
+  CloudOff,
   FileText,
   Heart,
   Home,
   Lock,
+  LogIn,
+  LogOut,
   MessageCircle,
   MoreHorizontal,
   Play,
@@ -47,8 +51,6 @@ import {
   getNextLesson,
   getPhaseProgress,
   getProgressSummary,
-  lessonKey,
-  normalizeStoredProgress,
 } from "./lib/courseProgress";
 import {
   classroomHash,
@@ -64,6 +66,9 @@ import { ModuleDetailPage } from "./components/course/ModuleDetailPage";
 import { ModulePhoto } from "./components/course/ModulePhoto";
 import { NextLessonCard } from "./components/course/NextLessonCard";
 import { ToolsSection } from "./components/course/ToolsSection";
+import { AccountAvatar, AuthModal } from "./components/auth/AuthModal";
+import { useAuth } from "./hooks/useAuth";
+import { useCourseProgress } from "./hooks/useCourseProgress";
 
 const posts = [
   ["Anna M.", "Mein erster Erfolg mit Modul 2!", "Ich konnte mein erstes Angebot sichtbar machen und bin so happy.", 24, 8],
@@ -73,8 +78,6 @@ const posts = [
 
 const members = ["Sophie L.", "Lena K.", "Marie B.", "Tanja W.", "Lisa M."];
 const pages = ["Übersicht", "Classroom", "Community", "Mitglieder", "Kalender", "Ressourcen", "Favoriten", "Einstellungen"];
-const adminPin = "KREA";
-
 const nav = [
   ["Übersicht", Home],
   ["Classroom", BookOpen],
@@ -95,6 +98,8 @@ const initialLessonIndex = Number.isInteger(initialRoute?.lessonIndex) && module
   : 0;
 
 function App() {
+  const auth = useAuth();
+  const { completedLessons, completeLesson, syncStatus, syncError } = useCourseProgress(auth.user);
   const [page, setPage] = useState(() => initialRoute?.type === "admin" ? "Admin" : initialRoute ? "Classroom" : "Übersicht");
   const [courseView, setCourseView] = useState(() => ["module", "lesson"].includes(initialRoute?.type) ? initialRoute.type : "catalog");
   const [activeModule, setActiveModule] = useState(initialModuleIndex);
@@ -102,15 +107,8 @@ function App() {
   const [query, setQuery] = useState("");
   const [drawer, setDrawer] = useState(null);
   const [toast, setToast] = useState("");
+  const [authOpen, setAuthOpen] = useState(false);
   const [enteredCourse, setEnteredCourse] = useState(() => Boolean(initialRoute));
-  const [adminUnlocked, setAdminUnlocked] = useState(() => sessionStorage.getItem("kreaAdminPreview") === "true");
-  const [completedLessons, setCompletedLessons] = useState(() => {
-    try {
-      return normalizeStoredProgress(JSON.parse(sessionStorage.getItem("kreaLessonProgress") || "[]"));
-    } catch {
-      return new Set();
-    }
-  });
   const progressSummary = useMemo(() => getProgressSummary(completedLessons), [completedLessons]);
   const nextLesson = useMemo(() => getNextLesson(completedLessons), [completedLessons]);
   const bookProject = useMemo(
@@ -172,10 +170,6 @@ function App() {
       window.removeEventListener("popstate", syncCourseRoute);
     };
   }, []);
-
-  useEffect(() => {
-    sessionStorage.setItem("kreaLessonProgress", JSON.stringify([...completedLessons]));
-  }, [completedLessons]);
 
   function updateHash(hash, replace = false) {
     if (window.location.hash === hash) return;
@@ -248,40 +242,24 @@ function App() {
     window.scrollTo({ top: 0, left: 0 });
   }
 
-  function markLessonComplete(moduleIndex = activeModule, lessonIndex = activeLesson) {
-    setCompletedLessons((current) => {
-      const next = new Set(current);
-      next.add(lessonKey(moduleIndex, lessonIndex));
-      return next;
-    });
+  async function markLessonComplete(moduleIndex = activeModule, lessonIndex = activeLesson) {
+    const result = await completeLesson(moduleIndex, lessonIndex);
+    if (result.error) notify(result.error);
   }
 
   function openNextLesson() {
     openLesson(nextLesson.moduleIndex, nextLesson.lessonIndex);
   }
 
-  function unlockAdmin(pin) {
-    if (pin.trim().toUpperCase() === adminPin) {
-      sessionStorage.setItem("kreaAdminPreview", "true");
-      setAdminUnlocked(true);
-      notify("Admin-Vorschau freigeschaltet.");
-      return true;
-    }
-    notify("PIN stimmt nicht.");
-    return false;
-  }
-
   if (page === "Admin") {
     return (
       <>
-        <AdminPage
-          modules={modules}
-          unlocked={adminUnlocked}
-          unlockAdmin={unlockAdmin}
-          goToPage={goToPage}
-          goToLanding={goToLanding}
-          notify={notify}
-        />
+        {auth.profile?.is_admin ? (
+          <AdminPage modules={modules} auth={auth} goToPage={goToPage} goToLanding={goToLanding} notify={notify} />
+        ) : (
+          <AdminGate auth={auth} goToLanding={goToLanding} onAuthOpen={() => setAuthOpen(true)} />
+        )}
+        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} auth={auth} syncStatus={syncStatus} />
         {toast && <div className="toast">{toast}</div>}
       </>
     );
@@ -290,7 +268,8 @@ function App() {
   if (page === "Übersicht" && !enteredCourse) {
     return (
       <>
-        <LandingPage setPage={goToPage} openModule={openModule} />
+        <LandingPage setPage={goToPage} openModule={openModule} onAuthOpen={() => setAuthOpen(true)} />
+        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} auth={auth} syncStatus={syncStatus} />
         {toast && <div className="toast">{toast}</div>}
       </>
     );
@@ -312,6 +291,10 @@ function App() {
           <p>Dein Fortschritt</p>
           <div className="ring" style={{ "--progress": `${progressSummary.percent}%` }}><strong>{progressSummary.percent}%</strong></div>
           <span>{progressSummary.completed} von {progressSummary.total} Lektionen</span>
+          <div className={`progress-sync ${syncStatus}`}>
+            {auth.user ? (syncStatus === "error" ? <CloudOff size={13} /> : <Cloud size={13} />) : <CloudOff size={13} />}
+            <small>{auth.user ? (syncStatus === "synced" ? "In Echtzeit gespeichert" : syncStatus === "error" ? "Synchronisierung pausiert" : "Wird synchronisiert") : "Nur auf diesem Gerät"}</small>
+          </div>
         </div>
       </aside>
 
@@ -339,9 +322,9 @@ function App() {
           <div className="top-actions">
             <button aria-label="Benachrichtigungen" onClick={() => setDrawer(drawer === "notice" ? null : "notice")}><Bell size={18} /><i /></button>
             <button aria-label="Nachrichten" onClick={() => setDrawer(drawer === "messages" ? null : "messages")}><MessageCircle size={18} /></button>
-            <button className="avatar" aria-label="Profil" onClick={() => setDrawer(drawer === "profile" ? null : "profile")}>K</button>
+            <button className="avatar account-trigger" aria-label="Profil" onClick={() => setDrawer(drawer === "profile" ? null : "profile")}><AccountAvatar auth={auth} size="small" /></button>
           </div>
-          {drawer && <TopDrawer type={drawer} setPage={goToPage} notify={notify} />}
+          {drawer && <TopDrawer type={drawer} setPage={goToPage} notify={notify} auth={auth} syncStatus={syncStatus} onAuthOpen={() => setAuthOpen(true)} />}
         </header>
 
         {page === "Übersicht" && (
@@ -375,14 +358,16 @@ function App() {
         {page === "Kalender" && <CalendarPage />}
         {page === "Ressourcen" && <Resources notify={notify} openModule={openModule} />}
         {page === "Favoriten" && <Favorites openModule={openModule} completedLessons={completedLessons} />}
-        {page === "Einstellungen" && <SettingsPage notify={notify} />}
+        {page === "Einstellungen" && <SettingsPage notify={notify} auth={auth} syncStatus={syncStatus} onAuthOpen={() => setAuthOpen(true)} />}
+        {syncError && syncStatus === "error" && <div className="sync-warning"><CloudOff size={15} /> {syncError}</div>}
+        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} auth={auth} syncStatus={syncStatus} />
         {toast && <div className="toast">{toast}</div>}
       </section>
     </main>
   );
 }
 
-function LandingPage({ setPage, openModule }) {
+function LandingPage({ setPage, openModule, onAuthOpen }) {
   const features = [
     [BookOpen, "Strukturierte Module", "Alles Schritt für Schritt erklärt", () => setPage("Classroom")],
     [Users, "Community", "Tausche dich mit anderen aus", () => setPage("Community")],
@@ -402,7 +387,7 @@ function LandingPage({ setPage, openModule }) {
           <button onClick={() => setPage("Ressourcen")}>FAQ</button>
         </nav>
         <div className="landing-actions">
-          <button className="landing-outline" onClick={() => setPage("Einstellungen")}>Anmelden</button>
+          <button className="landing-outline" onClick={onAuthOpen}>Anmelden</button>
           <button className="landing-solid" onClick={() => setPage("Übersicht")}>Jetzt starten</button>
         </div>
       </header>
@@ -419,7 +404,7 @@ function LandingPage({ setPage, openModule }) {
             <li><Check size={15} /> Community & Support</li>
           </ul>
           <div className="landing-cta-row">
-            <button className="landing-main-cta" onClick={() => setPage("Übersicht")}>Jetzt Mitglied werden <ChevronRight size={18} /></button>
+            <button className="landing-main-cta" onClick={onAuthOpen}>Jetzt Mitglied werden <ChevronRight size={18} /></button>
             <button className="landing-secondary-cta" onClick={() => openModule(0)}><Play size={16} /> Mehr erfahren</button>
           </div>
         </div>
@@ -485,8 +470,30 @@ function DesignBoard({ setPage, openModule }) {
   );
 }
 
-function AdminPage({ modules, unlocked, unlockAdmin, goToPage, goToLanding, notify }) {
-  const [pin, setPin] = useState("");
+function AdminGate({ auth, goToLanding, onAuthOpen }) {
+  const loading = auth.loading || auth.profileLoading;
+  return (
+    <main className="admin-gate">
+      <section className="admin-login-card">
+        <button className="admin-back" onClick={goToLanding}><ChevronLeft size={16} /> Zur Landingpage</button>
+        <div className="admin-lock"><Lock size={34} /></div>
+        <span>KREA-MIX Admin</span>
+        <h1>{loading ? "Berechtigung wird geprüft" : "Geschützter Verwaltungsbereich"}</h1>
+        <p>
+          {loading
+            ? "Dein Account und die Adminberechtigung werden sicher geladen."
+            : auth.user
+              ? "Dieser Account besitzt keine Adminberechtigung. Der Bereich bleibt für Mitglieder vollständig gesperrt."
+              : "Melde dich mit deinem persönlichen Administrator-Account an. Der Bereich ist nicht in der normalen Navigation sichtbar."}
+        </p>
+        {!loading && !auth.user && <button className="admin-primary" onClick={onAuthOpen}><LogIn size={17} /> Als Administrator anmelden</button>}
+        {!loading && auth.user && <button className="admin-primary" onClick={goToLanding}>Zur Kursseite</button>}
+      </section>
+    </main>
+  );
+}
+
+function AdminPage({ modules, auth, goToPage, goToLanding, notify }) {
   const [selectedModule, setSelectedModule] = useState(0);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [published, setPublished] = useState(() => modules.map((_, index) => index < 3));
@@ -497,33 +504,9 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, goToLanding, noti
     ["92%", "Systemstatus", ShieldCheck],
   ];
 
-  function submitPin(event) {
-    event.preventDefault();
-    if (unlockAdmin(pin)) setPin("");
-  }
-
   function togglePublished(index) {
     setPublished((current) => current.map((item, i) => (i === index ? !item : item)));
     notify(published[index] ? "Modul als Entwurf markiert." : "Modul freigegeben.");
-  }
-
-  if (!unlocked) {
-    return (
-      <main className="admin-gate">
-        <section className="admin-login-card">
-          <button className="admin-back" onClick={goToLanding}><ChevronLeft size={16} /> Zur Landingpage</button>
-          <div className="admin-lock"><Lock size={34} /></div>
-          <span>KREA-MIX Admin</span>
-          <h1>Gesch{"\u00fct"}zter Verwaltungsbereich</h1>
-          <p>Dies ist die visuelle Vorschau für deinen später echten Admin-Account. Der Bereich ist nicht in der normalen Navigation sichtbar.</p>
-          <form onSubmit={submitPin}>
-            <input value={pin} onChange={(event) => setPin(event.target.value)} placeholder="Preview-PIN eingeben" />
-            <button className="admin-primary">Adminbereich ansehen</button>
-          </form>
-          <small>Preview-PIN: <strong>{adminPin}</strong></small>
-        </section>
-      </main>
-    );
   }
 
   const active = modules[selectedModule];
@@ -534,9 +517,9 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, goToLanding, noti
         <button className="admin-brand" onClick={goToLanding}>KREA-MIX<span>*</span></button>
         <div className="admin-owner">
           <UserCog size={18} />
-          <div className="avatar">K</div>
+          <AccountAvatar auth={auth} size="small" />
           <div>
-            <strong>Klaus</strong>
+            <strong>{auth.profile?.display_name || "Administrator"}</strong>
             <span>Administrator</span>
           </div>
         </div>
@@ -667,11 +650,42 @@ function AdminPage({ modules, unlocked, unlockAdmin, goToPage, goToLanding, noti
   );
 }
 
-function TopDrawer({ type, setPage, notify }) {
+function TopDrawer({ type, setPage, notify, auth, syncStatus, onAuthOpen }) {
+  if (type === "profile") {
+    return (
+      <div className="top-drawer profile-drawer">
+        {auth.user ? (
+          <>
+            <div className="drawer-account">
+              <AccountAvatar auth={auth} size="small" />
+              <div>
+                <strong>{auth.profile?.display_name || auth.user.email}</strong>
+                <span>{auth.user.email}</span>
+              </div>
+            </div>
+            <div className={`drawer-sync ${syncStatus}`}><Cloud size={15} /> {syncStatus === "synced" ? "Fortschritt synchronisiert" : "Cloud-Speicherung aktiv"}</div>
+            <button onClick={() => setPage("Einstellungen")}>Profil und Einstellungen</button>
+            <button onClick={async () => {
+              const result = await auth.signOut();
+              notify(result.error || "Du wurdest abgemeldet.");
+            }}><LogOut size={16} /> Abmelden</button>
+          </>
+        ) : (
+          <>
+            <div className="drawer-account guest">
+              <AccountAvatar auth={auth} size="small" />
+              <div><strong>Dein KreaMix Account</strong><span>Fortschritt geräteübergreifend speichern</span></div>
+            </div>
+            <button onClick={onAuthOpen}><LogIn size={16} /> Anmelden oder registrieren</button>
+          </>
+        )}
+      </div>
+    );
+  }
+
   const content = {
     notice: ["Live-Q&A beginnt heute um 19:00", "Neue Workbook-Vorlage ist verfügbar", "Anna hat deinen Beitrag kommentiert"],
     messages: ["Sophie: Danke für deine Frage!", "Laura: Ich habe dir die Vorlage geteilt", "Team KREA: Willkommen im Kurs"],
-    profile: ["Profil bearbeiten", "Mein Fortschritt", "Einstellungen"],
   }[type];
   return (
     <div className="top-drawer">
@@ -824,8 +838,42 @@ function CalendarPage() {
   return <div className="page calendar-page"><SectionTitle title="Kalender" action="Monat" /><CalendarBlock /><Panel title="Deine nächsten Events"><Agenda /></Panel></div>;
 }
 
-function SettingsPage({ notify }) {
-  return <div className="page settings-page"><SectionTitle title="Einstellungen" action="Speichern" onClick={() => notify("Einstellungen gespeichert.")} /><Panel title="Profil"><input defaultValue="Klaus" /><input defaultValue="klaus@example.com" /><button className="primary" onClick={() => notify("Profil gespeichert.")}>Änderungen speichern</button></Panel></div>;
+function SettingsPage({ notify, auth, syncStatus, onAuthOpen }) {
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    setDisplayName(auth.profile?.display_name || "");
+  }, [auth.profile?.display_name]);
+
+  if (!auth.user) {
+    return (
+      <div className="page settings-page">
+        <SectionTitle title="Einstellungen" />
+        <Panel title="Dein Account">
+          <p className="settings-copy">Melde dich an, damit dein Fortschritt sicher gespeichert und auf deinen Geräten synchronisiert wird.</p>
+          <button className="primary" onClick={onAuthOpen}><LogIn size={17} /> Anmelden oder registrieren</button>
+        </Panel>
+      </div>
+    );
+  }
+
+  async function saveProfile() {
+    const result = await auth.updateProfile({ displayName });
+    notify(result.error || "Profil gespeichert.");
+  }
+
+  return (
+    <div className="page settings-page">
+      <SectionTitle title="Einstellungen" action="Speichern" onClick={saveProfile} />
+      <Panel title="Profil">
+        <div className="settings-account-head"><AccountAvatar auth={auth} /><div><strong>{auth.profile?.display_name || auth.user.email}</strong><span>{auth.user.email}</span></div></div>
+        <label className="settings-field"><span>Anzeigename</span><input value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={100} /></label>
+        <label className="settings-field"><span>E-Mail-Adresse</span><input value={auth.user.email || ""} readOnly /></label>
+        <div className={`settings-sync ${syncStatus}`}><Cloud size={18} /><div><strong>{syncStatus === "synced" ? "In Echtzeit synchronisiert" : "Cloud-Speicherung aktiv"}</strong><span>Deine abgeschlossenen Lektionen werden deinem Account zugeordnet.</span></div></div>
+        <div className="settings-actions"><button className="primary" onClick={saveProfile}>Änderungen speichern</button><button className="outline" onClick={async () => { const result = await auth.signOut(); notify(result.error || "Du wurdest abgemeldet."); }}><LogOut size={16} /> Abmelden</button></div>
+      </Panel>
+    </div>
+  );
 }
 
 function SectionTitle({ title, action, onClick }) {
