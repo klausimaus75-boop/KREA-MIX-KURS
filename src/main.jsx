@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Bell,
@@ -11,15 +11,18 @@ import {
   FileText,
   Heart,
   Home,
+  Lock,
   MessageCircle,
   MoreHorizontal,
   Play,
   Plus,
   Search,
   Settings,
+  ShieldCheck,
   Sparkles,
   Star,
   Upload,
+  UserCog,
   Users,
   X,
 } from "lucide-react";
@@ -103,6 +106,7 @@ const posts = [
 
 const members = ["Sophie L.", "Lena K.", "Marie B.", "Tanja W.", "Lisa M."];
 const pages = ["Uebersicht", "Classroom", "Community", "Mitglieder", "Kalender", "Ressourcen", "Favoriten", "Einstellungen"];
+const adminPin = "KREA";
 
 const nav = [
   ["Uebersicht", Home],
@@ -116,12 +120,13 @@ const nav = [
 ];
 
 function App() {
-  const [page, setPage] = useState("Uebersicht");
+  const [page, setPage] = useState(() => (window.location.hash === "#admin" ? "Admin" : "Uebersicht"));
   const [activeModule, setActiveModule] = useState(0);
   const [activeLesson, setActiveLesson] = useState(0);
   const [query, setQuery] = useState("");
   const [drawer, setDrawer] = useState(null);
   const [toast, setToast] = useState("");
+  const [adminUnlocked, setAdminUnlocked] = useState(() => sessionStorage.getItem("kreaAdminPreview") === "true");
   const stats = useMemo(
     () => [
       ["8", "Module", BookOpen],
@@ -140,6 +145,14 @@ function App() {
         .slice(0, 5)
     : [];
 
+  useEffect(() => {
+    function syncAdminRoute() {
+      if (window.location.hash === "#admin") setPage("Admin");
+    }
+    window.addEventListener("hashchange", syncAdminRoute);
+    return () => window.removeEventListener("hashchange", syncAdminRoute);
+  }, []);
+
   function openModule(moduleIndex, lessonIndex = 0) {
     setActiveModule(moduleIndex);
     setActiveLesson(lessonIndex);
@@ -157,7 +170,38 @@ function App() {
   function goToPage(nextPage) {
     setPage(nextPage);
     setDrawer(null);
+    if (nextPage === "Admin") {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#admin`);
+    } else if (window.location.hash === "#admin") {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    }
     window.scrollTo({ top: 0, left: 0 });
+  }
+
+  function unlockAdmin(pin) {
+    if (pin.trim().toUpperCase() === adminPin) {
+      sessionStorage.setItem("kreaAdminPreview", "true");
+      setAdminUnlocked(true);
+      notify("Admin-Vorschau freigeschaltet.");
+      return true;
+    }
+    notify("PIN stimmt nicht.");
+    return false;
+  }
+
+  if (page === "Admin") {
+    return (
+      <>
+        <AdminPage
+          modules={modules}
+          unlocked={adminUnlocked}
+          unlockAdmin={unlockAdmin}
+          goToPage={goToPage}
+          notify={notify}
+        />
+        {toast && <div className="toast">{toast}</div>}
+      </>
+    );
   }
 
   if (page === "Uebersicht") {
@@ -329,6 +373,187 @@ function DesignBoard({ setPage, openModule }) {
           </button>
         ))}
       </div>
+    </main>
+  );
+}
+
+function AdminPage({ modules, unlocked, unlockAdmin, goToPage, notify }) {
+  const [pin, setPin] = useState("");
+  const [selectedModule, setSelectedModule] = useState(0);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [published, setPublished] = useState(() => modules.map((_, index) => index < 3));
+  const adminStats = [
+    ["128", "Mitglieder", Users],
+    ["6", "Kursmodule", BookOpen],
+    ["14", "offene Aufgaben", FileText],
+    ["92%", "Systemstatus", ShieldCheck],
+  ];
+
+  function submitPin(event) {
+    event.preventDefault();
+    if (unlockAdmin(pin)) setPin("");
+  }
+
+  function togglePublished(index) {
+    setPublished((current) => current.map((item, i) => (i === index ? !item : item)));
+    notify(published[index] ? "Modul als Entwurf markiert." : "Modul freigegeben.");
+  }
+
+  if (!unlocked) {
+    return (
+      <main className="admin-gate">
+        <section className="admin-login-card">
+          <button className="admin-back" onClick={() => goToPage("Uebersicht")}><ChevronLeft size={16} /> Zur Landingpage</button>
+          <div className="admin-lock"><Lock size={34} /></div>
+          <span>KREA-MIX Admin</span>
+          <h1>Gesch{"\u00fct"}zter Verwaltungsbereich</h1>
+          <p>Dies ist die visuelle Vorschau fuer deinen spaeter echten Admin-Account. Der Bereich ist nicht in der normalen Navigation sichtbar.</p>
+          <form onSubmit={submitPin}>
+            <input value={pin} onChange={(event) => setPin(event.target.value)} placeholder="Preview-PIN eingeben" />
+            <button className="admin-primary">Adminbereich ansehen</button>
+          </form>
+          <small>Preview-PIN: <strong>{adminPin}</strong></small>
+        </section>
+      </main>
+    );
+  }
+
+  const active = modules[selectedModule];
+
+  return (
+    <main className="admin-shell">
+      <aside className="admin-sidebar">
+        <button className="admin-brand" onClick={() => goToPage("Uebersicht")}>KREA-MIX<span>*</span></button>
+        <div className="admin-owner">
+          <UserCog size={18} />
+          <div className="avatar">K</div>
+          <div>
+            <strong>Klaus</strong>
+            <span>Administrator</span>
+          </div>
+        </div>
+        <nav className="admin-nav">
+          {["Dashboard", "Kursinhalte", "Mitglieder", "Community", "Kalender", "Einstellungen"].map((item, index) => (
+            <button className={index === 0 ? "active" : ""} key={item}>{item}</button>
+          ))}
+        </nav>
+        <button className="admin-exit" onClick={() => goToPage("Uebersicht")}><ChevronLeft size={16} /> Zur Webseite</button>
+      </aside>
+
+      <section className="admin-workspace">
+        <header className="admin-topbar">
+          <div>
+            <span>Adminbereich</span>
+            <h1>Kurssteuerung</h1>
+          </div>
+          <div className="admin-top-actions">
+            <button onClick={() => notify("Entwurfsansicht vorbereitet.")}><Play size={17} /> Vorschau</button>
+            <button className="admin-primary" onClick={() => notify("Aenderungen lokal gespeichert.")}><Check size={17} /> Speichern</button>
+          </div>
+        </header>
+
+        <div className="admin-stat-grid">
+          {adminStats.map(([number, label, Icon]) => (
+            <article className="admin-stat" key={label}>
+              <Icon size={24} />
+              <strong>{number}</strong>
+              <span>{label}</span>
+            </article>
+          ))}
+        </div>
+
+        <section className="admin-grid">
+          <div className="admin-panel admin-panel-large">
+            <div className="admin-panel-head">
+              <div>
+                <span>Kursstruktur</span>
+                <h2>Module verwalten</h2>
+              </div>
+              <button onClick={() => notify("Neues Modul als Entwurf angelegt.")}><Plus size={16} /> Modul</button>
+            </div>
+            <div className="admin-module-list">
+              {modules.map((module, index) => (
+                <button className={selectedModule === index ? "selected" : ""} key={module.title} onClick={() => setSelectedModule(index)}>
+                  <div className={`photo ${module.photo}`} />
+                  <div>
+                    <span>{module.label}</span>
+                    <strong>{module.title}</strong>
+                    <small>{module.lessonsText} · {module.progress}% Fortschritt</small>
+                  </div>
+                  <em className={published[index] ? "live" : ""}>{published[index] ? "Live" : "Entwurf"}</em>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="admin-panel">
+            <div className="admin-panel-head">
+              <div>
+                <span>Auswahl</span>
+                <h2>{active.title}</h2>
+              </div>
+            </div>
+            <label className="admin-field">
+              Modultitel
+              <input value={active.title} readOnly />
+            </label>
+            <label className="admin-field">
+              Beschreibung
+              <textarea value={active.description} readOnly />
+            </label>
+            <div className="admin-toggle-row">
+              <div>
+                <strong>Ver{"\u00f6"}ffentlicht</strong>
+                <span>{published[selectedModule] ? "Teilnehmerinnen sehen dieses Modul." : "Nur Admin-Vorschau."}</span>
+              </div>
+              <button className={published[selectedModule] ? "toggle on" : "toggle"} onClick={() => togglePublished(selectedModule)} aria-label="Modul veroeffentlichen" />
+            </div>
+            <button className="admin-wide-button" onClick={() => notify("Lektionseditor vorbereitet.")}>Lektionen bearbeiten</button>
+          </div>
+
+          <div className="admin-panel">
+            <div className="admin-panel-head">
+              <div>
+                <span>Mitglieder</span>
+                <h2>Neueste Aktivitaet</h2>
+              </div>
+            </div>
+            <div className="admin-member-list">
+              {members.map((member, index) => (
+                <div key={member}>
+                  <div className="avatar">{member[0]}</div>
+                  <div>
+                    <strong>{member}</strong>
+                    <span>{index < 2 ? "Heute aktiv" : "Diese Woche aktiv"}</span>
+                  </div>
+                  <em>{index < 3 ? "Aktiv" : "Pause"}</em>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="admin-panel">
+            <div className="admin-panel-head">
+              <div>
+                <span>System</span>
+                <h2>Freigaben</h2>
+              </div>
+            </div>
+            <div className="admin-check-list">
+              {["Neue Kommentare pruefen", "Workbook Uploads kontrollieren", "Live-Q&A Termin veroeffentlichen"].map((item) => (
+                <label key={item}><input type="checkbox" /> {item}</label>
+              ))}
+            </div>
+            <div className="admin-toggle-row">
+              <div>
+                <strong>Wartungsmodus</strong>
+                <span>Nur als UI-Preview, spaeter mit Backend.</span>
+              </div>
+              <button className={maintenanceMode ? "toggle on" : "toggle"} onClick={() => setMaintenanceMode(!maintenanceMode)} aria-label="Wartungsmodus" />
+            </div>
+          </div>
+        </section>
+      </section>
     </main>
   );
 }
