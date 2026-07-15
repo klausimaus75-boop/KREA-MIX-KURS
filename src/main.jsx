@@ -43,16 +43,24 @@ import {
   totalPhases,
 } from "./data/courseData";
 import {
-  getModuleProgress,
+  getAdjacentLesson,
   getNextLesson,
+  getPhaseProgress,
   getProgressSummary,
   lessonKey,
   normalizeStoredProgress,
 } from "./lib/courseProgress";
+import {
+  classroomHash,
+  lessonHash,
+  moduleHash,
+  parseCourseHash,
+} from "./lib/courseRoutes";
 import { BookProjectCard } from "./components/course/BookProjectCard";
-import { CoursePhase } from "./components/course/CoursePhase";
-import { LessonOverview } from "./components/course/LessonOverview";
+import { ClassroomCatalog } from "./components/course/ClassroomCatalog";
+import { LessonPage } from "./components/course/LessonPage";
 import { ModuleCard } from "./components/course/ModuleCard";
+import { ModuleDetailPage } from "./components/course/ModuleDetailPage";
 import { ModulePhoto } from "./components/course/ModulePhoto";
 import { NextLessonCard } from "./components/course/NextLessonCard";
 import { ToolsSection } from "./components/course/ToolsSection";
@@ -78,14 +86,23 @@ const nav = [
   ["Einstellungen", Settings],
 ];
 
+const initialRoute = parseCourseHash(window.location.hash);
+const initialModuleIndex = Number.isInteger(initialRoute?.moduleIndex) && modules[initialRoute.moduleIndex]
+  ? initialRoute.moduleIndex
+  : 0;
+const initialLessonIndex = Number.isInteger(initialRoute?.lessonIndex) && modules[initialModuleIndex]?.lessons[initialRoute.lessonIndex]
+  ? initialRoute.lessonIndex
+  : 0;
+
 function App() {
-  const [page, setPage] = useState(() => (window.location.hash === "#admin" ? "Admin" : "Übersicht"));
-  const [activeModule, setActiveModule] = useState(0);
-  const [activeLesson, setActiveLesson] = useState(0);
+  const [page, setPage] = useState(() => initialRoute?.type === "admin" ? "Admin" : initialRoute ? "Classroom" : "Übersicht");
+  const [courseView, setCourseView] = useState(() => ["module", "lesson"].includes(initialRoute?.type) ? initialRoute.type : "catalog");
+  const [activeModule, setActiveModule] = useState(initialModuleIndex);
+  const [activeLesson, setActiveLesson] = useState(initialLessonIndex);
   const [query, setQuery] = useState("");
   const [drawer, setDrawer] = useState(null);
   const [toast, setToast] = useState("");
-  const [enteredCourse, setEnteredCourse] = useState(() => window.location.hash === "#admin");
+  const [enteredCourse, setEnteredCourse] = useState(() => Boolean(initialRoute));
   const [adminUnlocked, setAdminUnlocked] = useState(() => sessionStorage.getItem("kreaAdminPreview") === "true");
   const [completedLessons, setCompletedLessons] = useState(() => {
     try {
@@ -124,23 +141,79 @@ function App() {
     : [];
 
   useEffect(() => {
-    function syncAdminRoute() {
-      if (window.location.hash === "#admin") setPage("Admin");
+    function syncCourseRoute() {
+      const route = parseCourseHash(window.location.hash);
+      if (!route) {
+        setPage("Übersicht");
+        setEnteredCourse(false);
+        setCourseView("catalog");
+        return;
+      }
+      if (route.type === "admin") {
+        setPage("Admin");
+        setEnteredCourse(true);
+        return;
+      }
+
+      const moduleIndex = modules[route.moduleIndex] ? route.moduleIndex : 0;
+      const lessonIndex = modules[moduleIndex]?.lessons[route.lessonIndex] ? route.lessonIndex : 0;
+      setPage("Classroom");
+      setEnteredCourse(true);
+      setCourseView(route.type);
+      setActiveModule(moduleIndex);
+      setActiveLesson(lessonIndex);
+      setDrawer(null);
     }
-    window.addEventListener("hashchange", syncAdminRoute);
-    return () => window.removeEventListener("hashchange", syncAdminRoute);
+
+    window.addEventListener("hashchange", syncCourseRoute);
+    window.addEventListener("popstate", syncCourseRoute);
+    return () => {
+      window.removeEventListener("hashchange", syncCourseRoute);
+      window.removeEventListener("popstate", syncCourseRoute);
+    };
   }, []);
 
   useEffect(() => {
     sessionStorage.setItem("kreaLessonProgress", JSON.stringify([...completedLessons]));
   }, [completedLessons]);
 
-  function openModule(moduleIndex, lessonIndex = 0) {
+  function updateHash(hash, replace = false) {
+    if (window.location.hash === hash) return;
+    const nextUrl = `${window.location.pathname}${window.location.search}${hash}`;
+    window.history[replace ? "replaceState" : "pushState"](null, "", nextUrl);
+  }
+
+  function openClassroom() {
     setEnteredCourse(true);
-    setActiveModule(moduleIndex);
-    setActiveLesson(lessonIndex);
+    setPage("Classroom");
+    setCourseView("catalog");
+    setDrawer(null);
+    updateHash(classroomHash());
+    window.scrollTo({ top: 0, left: 0 });
+  }
+
+  function openModule(moduleIndex) {
+    const selectedModule = modules[moduleIndex] || modules[0];
+    setEnteredCourse(true);
+    setActiveModule(selectedModule.number - 1);
+    setActiveLesson(0);
+    setCourseView("module");
     setPage("Classroom");
     setDrawer(null);
+    updateHash(moduleHash(selectedModule.number));
+    window.scrollTo({ top: 0, left: 0 });
+  }
+
+  function openLesson(moduleIndex, lessonIndex = 0) {
+    const selectedModule = modules[moduleIndex] || modules[0];
+    const selectedLesson = selectedModule.lessons[lessonIndex] || selectedModule.lessons[0];
+    setEnteredCourse(true);
+    setActiveModule(selectedModule.number - 1);
+    setActiveLesson(selectedLesson.number - 1);
+    setCourseView("lesson");
+    setPage("Classroom");
+    setDrawer(null);
+    updateHash(lessonHash(selectedModule.number, selectedLesson.number));
     window.scrollTo({ top: 0, left: 0 });
   }
 
@@ -151,13 +224,17 @@ function App() {
   }
 
   function goToPage(nextPage) {
+    if (nextPage === "Classroom") {
+      openClassroom();
+      return;
+    }
     setEnteredCourse(true);
     setPage(nextPage);
     setDrawer(null);
     if (nextPage === "Admin") {
-      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#admin`);
-    } else if (window.location.hash === "#admin") {
-      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+      updateHash("#admin");
+    } else if (window.location.hash) {
+      updateHash("");
     }
     window.scrollTo({ top: 0, left: 0 });
   }
@@ -166,9 +243,8 @@ function App() {
     setEnteredCourse(false);
     setPage("Übersicht");
     setDrawer(null);
-    if (window.location.hash === "#admin") {
-      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
-    }
+    setCourseView("catalog");
+    updateHash("");
     window.scrollTo({ top: 0, left: 0 });
   }
 
@@ -181,7 +257,7 @@ function App() {
   }
 
   function openNextLesson() {
-    openModule(nextLesson.moduleIndex, nextLesson.lessonIndex);
+    openLesson(nextLesson.moduleIndex, nextLesson.lessonIndex);
   }
 
   function unlockAdmin(pin) {
@@ -247,7 +323,7 @@ function App() {
             {searchResults.length > 0 && (
               <div className="search-results">
                 {searchResults.map((result) => (
-                  <button key={result.lesson.id} onClick={() => openModule(result.moduleIndex, result.lessonIndex)}>
+                  <button key={result.lesson.id} onClick={() => openLesson(result.moduleIndex, result.lessonIndex)}>
                     <span>Modul {result.module.number}</span>
                     <strong>{result.lesson.title}</strong>
                   </button>
@@ -282,12 +358,15 @@ function App() {
         )}
         {page === "Classroom" && (
           <Classroom
+            view={courseView}
             activeModule={activeModule}
             activeLesson={activeLesson}
-            setActiveLesson={setActiveLesson}
             completedLessons={completedLessons}
             markLessonComplete={markLessonComplete}
+            openClassroom={openClassroom}
             openModule={openModule}
+            openLesson={openLesson}
+            openNextLesson={openNextLesson}
             notify={notify}
           />
         )}
@@ -644,89 +723,70 @@ function Dashboard({ stats, setPage, openModule, openNextLesson, progressSummary
   );
 }
 
-function Classroom({ activeModule, activeLesson, setActiveLesson, completedLessons, markLessonComplete, openModule, notify }) {
+function Classroom({
+  view,
+  activeModule,
+  activeLesson,
+  completedLessons,
+  markLessonComplete,
+  openClassroom,
+  openModule,
+  openLesson,
+  openNextLesson,
+  notify,
+}) {
   const selected = modules[activeModule];
   const lesson = selected.lessons[activeLesson] || selected.lessons[0];
-  const moduleProgress = getModuleProgress(activeModule, completedLessons);
-  const lessonDone = completedLessons.has(lessonKey(activeModule, activeLesson));
-  const completeLesson = () => markLessonComplete(activeModule, activeLesson);
-  const goToFollowingLesson = () => {
-    markLessonComplete(activeModule, activeLesson);
-    if (activeLesson < selected.lessons.length - 1) {
-      setActiveLesson(activeLesson + 1);
-      return;
-    }
-    if (activeModule < modules.length - 1) {
-      openModule(activeModule + 1, 0);
-    }
-  };
-  return (
-    <div className="page classroom">
-      <SectionTitle
-        title="Classroom"
-        action={`Modul ${selected.number} wechseln`}
-        onClick={() => document.getElementById("course-phases")?.scrollIntoView({ behavior: "smooth" })}
+  const phase = coursePhases.find((item) => item.id === selected.phaseId) || coursePhases[0];
+
+  if (view === "module") {
+    return (
+      <ModuleDetailPage
+        module={selected}
+        moduleIndex={activeModule}
+        phase={phase}
+        completedLessons={completedLessons}
+        onBack={openClassroom}
+        onLesson={(lessonIndex) => openLesson(activeModule, lessonIndex)}
       />
-      <div className="lesson-layout">
-        <div className="video-card">
-          <LessonOverview module={selected} lesson={lesson} moduleProgress={moduleProgress} />
-          <ModulePhoto module={selected}>
-            <a href={lesson.videoUrl} target="_blank" rel="noopener noreferrer" aria-label="Lektionsvideo öffnen">
-              <Play fill="currentColor" />
-            </a>
-          </ModulePhoto>
-          <span className="lesson-kicker">Modul {selected.number} / Lektion {lesson.number}</span>
-          <h2>{lesson.title}</h2>
-          {selected.subtitle ? <strong className="module-subtitle">{selected.subtitle}</strong> : null}
-          <div className="lesson-work">
-            <section>
-              <span>Lektionstext</span>
-              <p>{lesson.content}</p>
-            </section>
-            <section>
-              <span>Aufgabe</span>
-              <p>{lesson.task}</p>
-            </section>
-            <section>
-              <span>Downloads</span>
-              {lesson.downloads.map((download) => (
-                <button
-                  className="lesson-download"
-                  key={download.id}
-                  onClick={() => download.url ? window.open(download.url, "_blank", "noopener,noreferrer") : notify("Dieser Download wird im Backend verknüpft.")}
-                >
-                  <FileText size={15} /> {download.title} <small>{download.type}</small>
-                </button>
-              ))}
-            </section>
-          </div>
-          <div className="lesson-actions">
-            <button className="outline" onClick={completeLesson}><Check size={16} /> {lessonDone ? "Bereits erledigt" : "Als erledigt markieren"}</button>
-            <button className="primary" onClick={goToFollowingLesson}><ChevronRight size={16} /> N{"\u00e4"}chste Lektion</button>
-          </div>
-        </div>
-        <aside className="lesson-list">
-          <h3>Lektionen</h3>
-          {selected.lessons.map((item, i) => (
-            <button className={i === activeLesson ? "active" : ""} key={item.id} onClick={() => setActiveLesson(i)}>
-              <span>{selected.number}.{item.number}</span>{item.title}{completedLessons.has(lessonKey(activeModule, i)) && <Check size={14} />}<ChevronRight size={15} />
-            </button>
-          ))}
-        </aside>
-      </div>
-      <SectionTitle title="Alle Module nach Phasen" />
-      <div className="phase-stack" id="course-phases">
-        {coursePhases.map((phase) => (
-          <CoursePhase
-            key={phase.id}
-            phase={phase}
-            activeModule={activeModule}
-            completedLessons={completedLessons}
-            onOpen={(moduleIndex) => openModule(moduleIndex, 0)}
-          />
-        ))}
-      </div>
-    </div>
+    );
+  }
+
+  if (view === "lesson") {
+    return (
+      <LessonPage
+        module={selected}
+        moduleIndex={activeModule}
+        lesson={lesson}
+        lessonIndex={activeLesson}
+        phase={phase}
+        completedLessons={completedLessons}
+        previousLesson={getAdjacentLesson(activeModule, activeLesson, -1)}
+        nextLesson={getAdjacentLesson(activeModule, activeLesson, 1)}
+        onModule={() => openModule(activeModule)}
+        onNavigate={(target) => openLesson(target.moduleIndex, target.lessonIndex)}
+        onComplete={() => markLessonComplete(activeModule, activeLesson)}
+        onDownload={(download) => {
+          if (download.url) {
+            window.open(download.url, "_blank", "noopener,noreferrer");
+          } else {
+            notify(`${download.title} ist vorbereitet und wird mit dem Backend verknüpft.`);
+          }
+        }}
+      />
+    );
+  }
+
+  return (
+    <ClassroomCatalog
+      phases={coursePhases}
+      activeModule={activeModule}
+      completedLessons={completedLessons}
+      foundationProgress={getPhaseProgress("phase-1", completedLessons)}
+      nextLesson={getNextLesson(completedLessons)}
+      onModule={openModule}
+      onContinue={openNextLesson}
+    />
   );
 }
 

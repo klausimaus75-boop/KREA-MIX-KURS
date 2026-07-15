@@ -1,4 +1,4 @@
-import { modules, totalLessons } from "../data/courseData";
+import { coursePhases, modules, totalLessons } from "../data/courseData";
 
 export function lessonKey(moduleIndex, lessonIndex) {
   return modules[moduleIndex]?.lessons[lessonIndex]?.id || `${moduleIndex}:${lessonIndex}`;
@@ -43,6 +43,38 @@ export function getModuleProgress(moduleIndex, completedLessons) {
     total,
     percent: total ? Math.round((completed / total) * 100) : 0,
   };
+}
+
+export function getPhaseProgress(phaseId, completedLessons) {
+  const phase = coursePhases.find((item) => item.id === phaseId);
+  const moduleIndexes = phase
+    ? phase.moduleIds.map((moduleId) => modules.findIndex((module) => module.id === moduleId)).filter((index) => index >= 0)
+    : [];
+  const total = moduleIndexes.reduce((sum, moduleIndex) => sum + modules[moduleIndex].lessons.length, 0);
+  const completed = moduleIndexes.reduce(
+    (sum, moduleIndex) => sum + countCompletedForModule(completedLessons, moduleIndex),
+    0
+  );
+  return {
+    completed,
+    total,
+    percent: total ? Math.round((completed / total) * 100) : 0,
+  };
+}
+
+export function getAdjacentLesson(moduleIndex, lessonIndex, direction) {
+  const flatLessons = modules.flatMap((module, currentModuleIndex) =>
+    module.lessons.map((lesson, currentLessonIndex) => ({
+      module,
+      lesson,
+      moduleIndex: currentModuleIndex,
+      lessonIndex: currentLessonIndex,
+    }))
+  );
+  const currentIndex = flatLessons.findIndex(
+    (item) => item.moduleIndex === moduleIndex && item.lessonIndex === lessonIndex
+  );
+  return flatLessons[currentIndex + direction] || null;
 }
 
 export function getNextLesson(completedLessons) {

@@ -1,3 +1,5 @@
+import { foundationModuleContent } from "./foundationContent";
+
 const moduleImageFiles = import.meta.glob("../assets/modules/module-*.jpg", {
   eager: true,
   query: "?url",
@@ -323,31 +325,64 @@ const moduleSeeds = [
   },
 ];
 
-function createLesson(module, title, index) {
+function createLesson(module, moduleId, title, index) {
   const lessonNumber = index + 1;
   return {
     id: `module-${String(module.number).padStart(2, "0")}-lesson-${String(lessonNumber).padStart(2, "0")}`,
     number: lessonNumber,
+    moduleId,
     title,
+    shortDescription: `Du bearbeitest „${title}“ als nächsten konkreten Schritt deines Buchprojekts.`,
     whatWeDo: `Wir bearbeiten „${title}“ Schritt für Schritt und übertragen das Ergebnis direkt in dein Buchprojekt.`,
+    whyItMatters: "Dieser Schritt baut auf den vorherigen Entscheidungen auf und bereitet den nächsten Teil deines Buchprojekts vor.",
     result: `Du hast den Arbeitsschritt „${title}“ klar ausgearbeitet und dokumentiert.`,
+    videoType: "Erklärvideo",
     videoUrl: DEFAULT_VIDEO_URL,
-    content: `In dieser Arbeitslektion konzentrierst du dich auf „${title}“. Arbeite den Schritt in Ruhe durch und halte nur die Entscheidungen fest, die du für dein aktuelles Buch wirklich brauchst.`,
-    task: `Bearbeite „${title}“ für dein eigenes Buch und speichere das Ergebnis in deinem Kursordner.`,
+    estimatedDuration: "15 Minuten",
+    sections: [
+      {
+        title: "Schritt für Schritt",
+        paragraphs: [`In dieser Arbeitslektion konzentrierst du dich auf „${title}“. Arbeite den Schritt in Ruhe durch und halte nur die Entscheidungen fest, die du für dein aktuelles Buch wirklich brauchst.`],
+      },
+    ],
+    examples: [],
+    tips: ["Bearbeite nur den aktuellen Schritt und speichere das Ergebnis, bevor du weitergehst."],
+    task: {
+      title: title,
+      description: `Bearbeite „${title}“ für dein eigenes Buch und speichere das Ergebnis in deinem Kursordner.`,
+      steps: ["Aufgabe auf das eigene Projekt übertragen.", "Ergebnis prüfen.", "Ergebnis im passenden Projektordner speichern."],
+    },
+    checklist: ["Die Aufgabe ist bearbeitet.", "Das Ergebnis wurde geprüft.", "Das Ergebnis ist gespeichert."],
     downloads: [
       {
         id: `download-${module.number}-${lessonNumber}`,
         title: `Arbeitsblatt: ${title}`,
-        type: "PDF",
+        description: "Vorbereitete Arbeitsvorlage für diese Lektion.",
+        type: "PDF-Vorlage",
         url: null,
+        status: "prepared",
       },
     ],
+    nextLessonId: null,
   };
 }
+
+const foundationModulesByNumber = new Map(foundationModuleContent.map((module) => [module.number, module]));
 
 const modules = moduleSeeds.map((module) => {
   const id = `module-${String(module.number).padStart(2, "0")}`;
   const imageKey = `../assets/modules/module-${module.number}.jpg`;
+  const detailedModule = foundationModulesByNumber.get(module.number);
+
+  if (detailedModule) {
+    return {
+      ...detailedModule,
+      image: moduleImageFiles[imageKey] || null,
+      imageName: `module-${module.number}.jpg`,
+      isTool: Boolean(detailedModule.isTool),
+    };
+  }
+
   return {
     id,
     number: module.number,
@@ -356,11 +391,26 @@ const modules = moduleSeeds.map((module) => {
     subtitle: module.subtitle || "",
     description: module.result,
     result: module.result,
+    resultItems: [module.result],
+    introduction: `In diesem Modul bearbeitest du „${module.title}“ Schritt für Schritt und überträgst alle Ergebnisse direkt in dein Buchprojekt.`,
+    introductionVideo: {
+      type: "Einführungsvideo",
+      url: null,
+      script: `Willkommen in Modul ${module.number}: ${module.title}. In diesem Modul arbeitest du Schritt für Schritt an ${module.subtitle || module.title}. Bearbeite die Lektionen in Ruhe, erledige die Aufgaben und speichere deine Ergebnisse, bevor du weitergehst.`,
+    },
     image: moduleImageFiles[imageKey] || null,
     imageName: `module-${module.number}.jpg`,
     isTool: Boolean(module.isTool),
-    lessons: module.lessons.map((lesson, index) => createLesson(module, lesson, index)),
+    lessons: module.lessons.map((lesson, index) => createLesson(module, id, lesson, index)),
   };
+});
+
+modules.forEach((module, moduleIndex) => {
+  module.lessons.forEach((lesson, lessonIndex) => {
+    const nextInModule = module.lessons[lessonIndex + 1];
+    const nextModule = modules[moduleIndex + 1];
+    lesson.nextLessonId = nextInModule?.id || nextModule?.lessons[0]?.id || null;
+  });
 });
 
 export const courseData = {
@@ -395,4 +445,3 @@ export const demoBookProject = {
   currentStep: "Mit Modul 1 beginnen",
   progress: 0,
 };
-
