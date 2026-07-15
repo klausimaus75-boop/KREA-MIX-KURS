@@ -27,64 +27,64 @@ import "./styles.css";
 
 const modules = [
   {
-    title: "Idee",
-    subtitle: "Das Fundament",
+    title: "Dein Fundament",
+    subtitle: "",
     label: "Modul 1",
-    progress: 50,
-    lessonsText: "2 Lektionen",
+    progress: 80,
+    lessonsText: "12 Lektionen",
     photo: "desk",
-    description: "Orientierung schaffen, Ordnung anlegen und eine erste Richtung fuer dein Projekt festlegen.",
-    lessons: ["Was wir hier wirklich bauen", "Deinen Werkzeugkasten auspacken"],
+    description: "Lege die Basis fuer deine kreative Positionierung und klare Wochenstruktur.",
+    lessons: ["Deine Vision & Ziele", "Deine Zielgruppe", "Positionierung", "Deine Botschaft", "Zusammenfassung"],
   },
   {
-    title: "Inhalt",
-    subtitle: "Der Kern",
+    title: "Dein Angebot",
+    subtitle: "",
     label: "Modul 2",
-    progress: 0,
-    lessonsText: "In Planung",
+    progress: 60,
+    lessonsText: "10 Lektionen",
     photo: "candles",
-    description: "Hier entsteht der inhaltliche Kern deines Buchprojekts.",
-    lessons: ["Inhalt strukturieren", "Kapitelgeruest anlegen", "Rohfassung vorbereiten"],
+    description: "Forme aus deiner Idee ein Angebot, das sich leicht erklaeren und verkaufen laesst.",
+    lessons: ["Angebotskern", "Promise & Ergebnis", "Preisstruktur", "Launch-Check", "Workbook"],
   },
   {
-    title: "Canva-Dateien",
-    subtitle: "Das Design",
+    title: "Deine Sichtbarkeit",
+    subtitle: "",
     label: "Modul 3",
-    progress: 0,
-    lessonsText: "In Planung",
+    progress: 45,
+    lessonsText: "8 Lektionen",
     photo: "tablet",
-    description: "Aus deinem Inhalt werden Canva-Dateien und ein klares Buchdesign.",
-    lessons: ["Canva-Datei vorbereiten", "Layout-System verstehen", "Design finalisieren"],
+    description: "Plane Content, der warm wirkt und trotzdem strategisch auf dein Ziel einzahlt.",
+    lessons: ["Content-Saeulen", "Instagram-Rhythmus", "Storytelling", "Call to Action", "Redaktionsplan"],
   },
   {
-    title: "Qualitaetscheck",
-    subtitle: "Der Feinschliff",
+    title: "Deine Produkte",
+    subtitle: "",
     label: "Modul 4",
     progress: 0,
-    lessonsText: "In Planung",
+    lessonsText: "6 Lektionen",
     photo: "journal",
-    description: "Wir pruefen dein Ergebnis, schleifen Details nach und sichern die Qualitaet.",
-    lessons: ["Checkliste durchgehen", "Feinschliff planen", "Finale Datei sichern"],
+    description: "Baue digitale Produkte, Vorlagen und Ressourcen fuer deinen Kurskosmos.",
+    lessons: ["Produktidee", "Struktur", "Materialien", "Pricing", "Upload"],
   },
   {
-    title: "KDP-Upload-Plan",
-    subtitle: "Die Technik",
+    title: "Verkauf & Marketing",
+    subtitle: "",
     label: "Modul 5",
     progress: 0,
-    lessonsText: "In Planung",
+    lessonsText: "6 Lektionen",
     photo: "laptop",
-    description: "Der technische Plan fuer Upload, Dateien und die naechsten KDP-Schritte.",
-    lessons: ["Upload vorbereiten", "Dateien pruefen", "KDP-Schritte planen"],
+    description: "Erstelle eine Verkaufsseite, E-Mail-Sequenz und klare Kundenreise.",
+    lessons: ["Sales Page", "E-Mail Flow", "Einwandarbeit", "Checkout", "Analyse"],
   },
   {
-    title: "Marketingstart",
-    subtitle: "Der Launch",
+    title: "Automation & Tools",
+    subtitle: "",
     label: "Modul 6",
     progress: 0,
-    lessonsText: "In Planung",
+    lessonsText: "7 Lektionen",
     photo: "studio",
-    description: "Der Startpunkt fuer deine Sichtbarkeit und den Launch deines Buchprojekts.",
-    lessons: ["Launch vorbereiten", "Marketingstart planen", "Naechsten Schritt sichern"],
+    description: "Verbinde Tools, Vorlagen und Automationen fuer ein leichteres Kurssystem.",
+    lessons: ["Toolstack", "Zapier Basics", "Memberbereich", "Tracking", "Launch-Board"],
   },
 ];
 
@@ -118,7 +118,7 @@ function App() {
   const stats = useMemo(
     () => [
       ["8", "Module", BookOpen],
-      ["17", "Lektionen", FileText],
+      ["24", "Lektionen", FileText],
       ["12h", "Lernzeit", Clock3],
       ["65%", "Fortschritt", Sparkles],
     ],
@@ -246,13 +246,9 @@ function Dashboard({ stats, setPage, openModule }) {
         </div>
         <button className="primary" onClick={() => openModule(0, 1)}><Play size={17} /> Weiterlernen</button>
       </div>
-      <div className="stats">{stats.map(([n, l, Icon]) => <Glass key={l}><Icon /><strong>{l === "Module" ? modules.length : n}</strong><span>{l}</span></Glass>)}</div>
+      <div className="stats">{stats.map(([n, l, Icon]) => <Glass key={l}><Icon /><strong>{n}</strong><span>{l}</span></Glass>)}</div>
       <SectionTitle title="Deine Module" action="Alle anzeigen" onClick={() => setPage("Classroom")} />
       <div className="module-grid">{modules.map((m, i) => <ModuleCard key={m.title} data={m} onClick={() => openModule(i)} />)}</div>
-      <div className="split">
-        <Panel title="Neue Beitraege"><PostList compact /></Panel>
-        <Panel title="Naechste Termine"><Agenda /></Panel>
-      </div>
     </div>
   );
 }
@@ -269,7 +265,7 @@ function Classroom({ activeModule, activeLesson, setActiveModule, setActiveLesso
           <div className={`photo ${selected.photo}`}><button aria-label="Lektion starten"><Play fill="currentColor" /></button></div>
           <span className="lesson-kicker">{selected.label} / Lektion {activeLesson + 1}</span>
           <h2>{lesson}</h2>
-          <strong className="module-subtitle">{selected.title} - {selected.subtitle}</strong>
+          {selected.subtitle && <strong className="module-subtitle">{selected.subtitle}</strong>}
           <p>{selected.description}</p>
           <div className="lesson-actions">
             <button className="outline" onClick={completeLesson}><Check size={16} /> Als abgeschlossen markieren</button>
@@ -362,7 +358,7 @@ function ModuleCard({ data, selected, onClick }) {
       <div className={`photo ${data.photo}`} />
       <span>{data.label}</span>
       <strong>{data.title}</strong>
-      <em>{data.subtitle}</em>
+      {data.subtitle && <em>{data.subtitle}</em>}
       <div className="bar"><i style={{ width: `${data.progress}%` }} /></div>
       <small>{data.lessonsText}<b>{data.progress}%</b></small>
     </button>
