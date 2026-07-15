@@ -24,6 +24,12 @@ import {
   X,
 } from "lucide-react";
 import "./styles.css";
+import referenceClassroom from "./assets/reference-classroom.png";
+import referenceCommunity from "./assets/reference-community.png";
+import referenceCalendar from "./assets/reference-calendar.png";
+import referenceDashboard from "./assets/reference-dashboard.png";
+import referenceHero from "./assets/reference-hero.png";
+import referenceMembers from "./assets/reference-members.png";
 
 const modules = [
   {
@@ -151,6 +157,15 @@ function App() {
     setDrawer(null);
   }
 
+  if (page === "Uebersicht") {
+    return (
+      <>
+        <DesignBoard setPage={goToPage} openModule={openModule} />
+        {toast && <div className="toast">{toast}</div>}
+      </>
+    );
+  }
+
   return (
     <main className="app-shell" data-version="pages-fix-1">
       <aside className="sidebar">
@@ -199,7 +214,6 @@ function App() {
           {drawer && <TopDrawer type={drawer} setPage={goToPage} notify={notify} />}
         </header>
 
-        {page === "Uebersicht" && <Dashboard stats={stats} setPage={goToPage} openModule={openModule} />}
         {page === "Classroom" && <Classroom activeModule={activeModule} activeLesson={activeLesson} setActiveModule={setActiveModule} setActiveLesson={setActiveLesson} />}
         {page === "Community" && <Community notify={notify} />}
         {page === "Mitglieder" && <Members />}
@@ -209,6 +223,53 @@ function App() {
         {page === "Einstellungen" && <SettingsPage notify={notify} />}
         {toast && <div className="toast">{toast}</div>}
       </section>
+    </main>
+  );
+}
+
+function DesignBoard({ setPage, openModule }) {
+  const previewCards = [
+    ["Community", referenceCommunity],
+    ["Kalender", referenceCalendar],
+    ["Mitglieder", referenceMembers],
+    ["Classroom", referenceClassroom],
+  ];
+
+  return (
+    <main className="reference-board" aria-label="KREA-MIX Kurs Dashboard">
+      <section className="reference-panel reference-hero" aria-label="KREA-MIX Startbereich">
+        <img src={referenceHero} alt="" />
+        <button className="hotspot hero-primary" onClick={() => setPage("Classroom")} aria-label="Jetzt Mitglied werden" />
+        <button className="hotspot hero-secondary" onClick={() => openModule(0)} aria-label="Mehr erfahren" />
+      </section>
+
+      <section className="reference-panel reference-dashboard" aria-label="KREA-MIX Dashboard">
+        <img src={referenceDashboard} alt="" />
+        <button className="hotspot nav-overview" onClick={() => setPage("Uebersicht")} aria-label="Uebersicht" />
+        <button className="hotspot nav-classroom" onClick={() => setPage("Classroom")} aria-label="Classroom" />
+        <button className="hotspot nav-community" onClick={() => setPage("Community")} aria-label="Community" />
+        <button className="hotspot nav-members" onClick={() => setPage("Mitglieder")} aria-label="Mitglieder" />
+        <button className="hotspot nav-calendar" onClick={() => setPage("Kalender")} aria-label="Kalender" />
+        <button className="hotspot nav-resources" onClick={() => setPage("Ressourcen")} aria-label="Ressourcen" />
+        <button className="hotspot nav-favorites" onClick={() => setPage("Favoriten")} aria-label="Favoriten" />
+        <button className="hotspot nav-settings" onClick={() => setPage("Einstellungen")} aria-label="Einstellungen" />
+        {modules.map((module, index) => (
+          <button
+            key={module.title}
+            className={`hotspot module-hotspot module-hotspot-${index + 1}`}
+            onClick={() => openModule(index)}
+            aria-label={module.title}
+          />
+        ))}
+      </section>
+
+      <div className="reference-previews">
+        {previewCards.map(([label, image]) => (
+          <button className="reference-panel reference-preview" key={label} onClick={() => setPage(label)} aria-label={label}>
+            <img src={image} alt="" />
+          </button>
+        ))}
+      </div>
     </main>
   );
 }

@@ -31,21 +31,93 @@ body::before {
 }
 
 body::after {
-  content: "";
-  position: fixed;
-  left: -40px;
-  bottom: -80px;
-  width: 360px;
-  height: 520px;
-  background:
-    radial-gradient(ellipse at 50% 26%, rgba(255,255,255,.5) 0 18%, transparent 19%),
-    radial-gradient(ellipse at 33% 42%, rgba(232,121,97,.32) 0 14%, transparent 15%),
-    radial-gradient(ellipse at 67% 43%, rgba(245,180,162,.34) 0 15%, transparent 16%),
-    radial-gradient(ellipse at 50% 55%, rgba(255,230,222,.75) 0 22%, transparent 23%);
-  filter: blur(.2px);
-  opacity: .36;
-  z-index: -1;
+  content: none;
 }
+
+.reference-board {
+  width: min(1536px, 100vw);
+  margin: 0 auto;
+  padding: 12px 10px;
+  display: grid;
+  grid-template-columns: 768fr 735fr;
+  gap: 12px;
+}
+
+.reference-panel {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  padding: 0;
+  background: transparent;
+  box-shadow: 0 16px 46px rgba(93, 62, 45, .08);
+}
+
+.reference-panel img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reference-hero,
+.reference-dashboard {
+  aspect-ratio: 768 / 656;
+}
+
+.reference-dashboard {
+  aspect-ratio: 735 / 656;
+}
+
+.reference-previews {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 365fr 375fr 338fr 409fr;
+  gap: 10px;
+}
+
+.reference-preview {
+  aspect-ratio: auto;
+  cursor: pointer;
+}
+
+.reference-preview img {
+  height: auto;
+}
+
+.hotspot {
+  position: absolute;
+  z-index: 4;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255,255,255,0);
+}
+
+.hotspot:hover {
+  background: rgba(232, 121, 97, .08);
+  outline: 1px solid rgba(232, 121, 97, .18);
+}
+
+.hero-primary { left: 7%; top: 65%; width: 20%; height: 7%; }
+.hero-secondary { left: 29%; top: 65%; width: 16%; height: 7%; }
+
+.nav-overview { left: 2.2%; top: 11%; width: 18%; height: 5.3%; }
+.nav-classroom { left: 2.2%; top: 16.7%; width: 18%; height: 5.3%; }
+.nav-community { left: 2.2%; top: 22.2%; width: 18%; height: 5.3%; }
+.nav-members { left: 2.2%; top: 27.8%; width: 18%; height: 5.3%; }
+.nav-calendar { left: 2.2%; top: 33.4%; width: 18%; height: 5.3%; }
+.nav-resources { left: 2.2%; top: 39%; width: 18%; height: 5.3%; }
+.nav-favorites { left: 2.2%; top: 44.6%; width: 18%; height: 5.3%; }
+.nav-settings { left: 2.2%; top: 50.2%; width: 18%; height: 5.3%; }
+
+.module-hotspot { width: 18.4%; height: 27%; }
+.module-hotspot-1 { left: 28.5%; top: 45.8%; }
+.module-hotspot-2 { left: 50.5%; top: 45.8%; }
+.module-hotspot-3 { left: 72.2%; top: 45.8%; }
+.module-hotspot-4 { left: 28.5%; top: 76.2%; height: 21%; }
+.module-hotspot-5 { left: 50.5%; top: 76.2%; height: 21%; }
+.module-hotspot-6 { left: 72.2%; top: 76.2%; height: 21%; }
 
 .app-shell {
   width: min(738px, calc(100vw - 24px));
