@@ -24,7 +24,7 @@ import {
   X,
 } from "lucide-react";
 import "./styles.css";
-import landingPage from "./assets/landing-page.png";
+import heroGenerated from "./assets/hero-generated-2k.png";
 import referenceClassroom from "./assets/reference-classroom.png";
 import referenceCommunity from "./assets/reference-community.png";
 import referenceCalendar from "./assets/reference-calendar.png";
@@ -231,18 +231,57 @@ function App() {
 }
 
 function LandingPage({ setPage, openModule }) {
+  const features = [
+    [BookOpen, "Strukturierte Module", "Alles Schritt fuer Schritt erklaert", () => setPage("Classroom")],
+    [Users, "Community", "Tausche dich mit anderen aus", () => setPage("Community")],
+    [CalendarDays, "Flexibel lernen", "Lerne wann und wo du willst", () => setPage("Kalender")],
+    [Star, "Praxis & Ergebnisse", "Weniger Theorie, mehr Umsetzung", () => openModule(0)],
+  ];
+
   return (
     <main className="landing-page" aria-label="KREA-MIX Landingpage">
-      <img src={landingPage} alt="KREA-MIX Landingpage" />
-      <button className="landing-hotspot landing-about" onClick={() => openModule(0)} aria-label="Ueber den Kurs" />
-      <button className="landing-hotspot landing-content" onClick={() => setPage("Classroom")} aria-label="Inhalte" />
-      <button className="landing-hotspot landing-audience" onClick={() => setPage("Community")} aria-label="Fuer wen" />
-      <button className="landing-hotspot landing-benefits" onClick={() => setPage("Mitglieder")} aria-label="Vorteile" />
-      <button className="landing-hotspot landing-faq" onClick={() => setPage("Ressourcen")} aria-label="FAQ" />
-      <button className="landing-hotspot landing-login" onClick={() => setPage("Einstellungen")} aria-label="Anmelden" />
-      <button className="landing-hotspot landing-start-top" onClick={() => setPage("Classroom")} aria-label="Jetzt starten" />
-      <button className="landing-hotspot landing-start-main" onClick={() => setPage("Classroom")} aria-label="Jetzt Mitglied werden" />
-      <button className="landing-hotspot landing-more" onClick={() => openModule(0)} aria-label="Mehr erfahren" />
+      <header className="landing-header">
+        <button className="landing-brand" onClick={() => setPage("Uebersicht")}>KREA-MIX<span>*</span></button>
+        <nav className="landing-nav" aria-label="Landing Navigation">
+          <button onClick={() => openModule(0)}>Ueber den Kurs</button>
+          <button onClick={() => setPage("Classroom")}>Inhalte</button>
+          <button onClick={() => setPage("Community")}>Fuer wen?</button>
+          <button onClick={() => setPage("Mitglieder")}>Vorteile</button>
+          <button onClick={() => setPage("Ressourcen")}>FAQ</button>
+        </nav>
+        <div className="landing-actions">
+          <button className="landing-outline" onClick={() => setPage("Einstellungen")}>Anmelden</button>
+          <button className="landing-solid" onClick={() => setPage("Classroom")}>Jetzt starten</button>
+        </div>
+      </header>
+
+      <section className="landing-hero">
+        <img className="landing-hero-image" src={heroGenerated} alt="" />
+        <div className="landing-copy">
+          <div className="landing-pill"><Heart size={15} /> Dein kreativer Online-Kurs</div>
+          <h1>Kreativit{"\u00e4"}t trifft<br />Strategie - dein Weg<br />zu mehr <span>Erfolg</span></h1>
+          <p>Lerne Schritt f{"\u00fc"}r Schritt, wie du deine Ideen umsetzt, sichtbar wirst und dein Herzensprojekt erfolgreich aufbaust.</p>
+          <ul>
+            <li><Check size={15} /> Praxisnahe Module</li>
+            <li><Check size={15} /> Sofort umsetzbar</li>
+            <li><Check size={15} /> Community & Support</li>
+          </ul>
+          <div className="landing-cta-row">
+            <button className="landing-main-cta" onClick={() => setPage("Classroom")}>Jetzt Mitglied werden <ChevronRight size={18} /></button>
+            <button className="landing-secondary-cta" onClick={() => openModule(0)}><Play size={16} /> Mehr erfahren</button>
+          </div>
+        </div>
+      </section>
+
+      <section className="landing-feature-row" aria-label="Kursvorteile">
+        {features.map(([Icon, title, text, action]) => (
+          <button className="landing-feature" key={title} onClick={action}>
+            <Icon size={34} />
+            <strong>{title}</strong>
+            <span>{text}</span>
+          </button>
+        ))}
+      </section>
     </main>
   );
 }
