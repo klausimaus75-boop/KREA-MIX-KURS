@@ -42,7 +42,7 @@ const modules = [
     label: "Modul 1",
     progress: 0,
     lessonsText: "5 Lektionen",
-    photo: "desk",
+    photo: "module-01",
     description: "Kursordner steht, Ziel ist klar, die Teilnehmerin weiß, wie sie den Kurs abarbeitet.",
     lessons: [
       "Kursversprechen: Am Ende steht ein fertiges Buchprojekt mit Upload-Plan",
@@ -58,7 +58,7 @@ const modules = [
     label: "Modul 2",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "candles",
+    photo: "module-02",
     description: "Ein Nachschlagebereich, der später immer wieder genutzt werden kann.",
     lessons: [
       "KDP, Amazon, Taschenbuch, Hardcover, E-Book, Print-on-Demand",
@@ -75,7 +75,7 @@ const modules = [
     label: "Modul 3",
     progress: 0,
     lessonsText: "5 Lektionen",
-    photo: "tablet",
+    photo: "module-03",
     description: "Die Teilnehmerin kann ChatGPT als ruhigen Buchhelfer nutzen.",
     lessons: [
       "Wie spreche ich mit ChatGPT, damit brauchbare Antworten entstehen?",
@@ -91,7 +91,7 @@ const modules = [
     label: "Modul 4",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "journal",
+    photo: "module-04",
     description: "Die Teilnehmerin weiß, welcher Bot bei welchem Schritt hilft.",
     lessons: [
       "Nischen-Bot: Buchideen prüfen, Konkurrenz einschätzen, Herzbewertung",
@@ -108,7 +108,7 @@ const modules = [
     label: "Modul 5",
     progress: 0,
     lessonsText: "5 Lektionen",
-    photo: "laptop",
+    photo: "module-05",
     description: "Eine geprüfte Buchidee steht fest.",
     lessons: [
       "Nische finden: Für wen soll das Buch sein?",
@@ -124,7 +124,7 @@ const modules = [
     label: "Modul 6",
     progress: 0,
     lessonsText: "5 Lektionen",
-    photo: "studio",
+    photo: "module-06",
     description: "Ein sauberer Bauplan für das Buch ist fertig.",
     lessons: [
       "Format und Umfang grob festlegen: z. B. A4, 6x9, quadratisch",
@@ -140,7 +140,7 @@ const modules = [
     label: "Modul 7",
     progress: 0,
     lessonsText: "5 Lektionen",
-    photo: "desk",
+    photo: "module-07",
     description: "Die Inhalte liegen vor und können gestaltet werden.",
     lessons: [
       "Prompts für Texte, Aufgaben, Übungen, Rezepte, Rätsel oder Journalseiten",
@@ -156,7 +156,7 @@ const modules = [
     label: "Modul 8",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "candles",
+    photo: "module-08",
     description: "Innenseiten und Cover sind als Dateien vorbereitet.",
     lessons: [
       "Canva-Grundlagen: Oberfläche, Seiten, Raster, Vorlagen, Elemente",
@@ -173,7 +173,7 @@ const modules = [
     label: "Modul 9",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "tablet",
+    photo: "module-09",
     description: "Das Buch ist bereit für den KDP-Upload oder einen Probedruck.",
     lessons: [
       "Textcheck: Rechtschreibung, Sinn, Wiederholungen, falsche Aussagen",
@@ -190,7 +190,7 @@ const modules = [
     label: "Modul 10",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "journal",
+    photo: "module-10",
     description: "Das KDP-Konto ist grundsätzlich uploadbereit.",
     lessons: [
       "KDP-Konto anlegen oder einloggen",
@@ -207,7 +207,7 @@ const modules = [
     label: "Modul 11",
     progress: 0,
     lessonsText: "7 Lektionen",
-    photo: "laptop",
+    photo: "module-11",
     description: "Das Buch ist hochgeladen und bereit zur Veröffentlichung oder Prüfung.",
     lessons: [
       "Neues Buchprojekt in KDP anlegen",
@@ -225,7 +225,7 @@ const modules = [
     label: "Modul 12",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "studio",
+    photo: "module-12",
     description: "Die Teilnehmerin weiß, was nach Veröffentlichung organisatorisch wichtig ist.",
     lessons: [
       "Impressum und Pflichtangaben prüfen",
@@ -242,7 +242,7 @@ const modules = [
     label: "Modul 13",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "desk",
+    photo: "module-13",
     description: "Das Buch sieht nach außen professioneller und klarer aus.",
     lessons: [
       "Buchbeschreibung verbessern: Nutzen, Zielgruppe, klare Sprache",
@@ -259,7 +259,7 @@ const modules = [
     label: "Modul 14",
     progress: 0,
     lessonsText: "7 Lektionen",
-    photo: "candles",
+    photo: "module-14",
     description: "Ein einfacher Marketingstart steht.",
     lessons: [
       "Zielgruppe in Alltagssprache beschreiben",
@@ -277,7 +277,7 @@ const modules = [
     label: "Modul 15",
     progress: 0,
     lessonsText: "7 Lektionen",
-    photo: "tablet",
+    photo: "module-15",
     description: "Die Teilnehmerin versteht Affiliate als sinnvolles Empfehlungssystem.",
     lessons: [
       "Affiliate einfach erklärt: Empfehlung, Provision, Kennzeichnung",
@@ -295,7 +295,7 @@ const modules = [
     label: "Modul 16",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "journal",
+    photo: "module-16",
     description: "Ein Werkzeugkasten mit Vorlagen, Hooks, Prompts und Checklisten ist fertig.",
     lessons: [
       "Prompts für Nische, Buchidee, Struktur, Inhalte, Titel, Beschreibung",
@@ -312,7 +312,7 @@ const modules = [
     label: "Modul 17",
     progress: 0,
     lessonsText: "7 Lektionen",
-    photo: "laptop",
+    photo: "module-17",
     description: "Die Teilnehmerin hat einen Erste-Hilfe-Bereich für typische Stolperstellen.",
     lessons: [
       "KDP meckert: Was kann die Ursache sein?",
@@ -330,7 +330,7 @@ const modules = [
     label: "Modul 18",
     progress: 0,
     lessonsText: "6 Lektionen",
-    photo: "studio",
+    photo: "module-18",
     description: "Die Teilnehmerin kann den Prozess erneut anwenden.",
     lessons: [
       "Was vom ersten Buch wiederverwendet werden kann",
@@ -968,7 +968,7 @@ function PostList({ compact }) {
 }
 
 function Post({ post, compact }) {
-  return <article className="post"><div className="avatar">{post[0][0]}</div><div><strong>{post[1]}</strong><p>{post[2]}</p><span><Heart size={14} /> {post[3]} <MessageCircle size={14} /> {post[4]} Kommentare</span></div>{!compact && <div className="thumb photo candles" />}</article>;
+  return <article className="post"><div className="avatar">{post[0][0]}</div><div><strong>{post[1]}</strong><p>{post[2]}</p><span><Heart size={14} /> {post[3]} <MessageCircle size={14} /> {post[4]} Kommentare</span></div>{!compact && <div className="thumb photo module-14" />}</article>;
 }
 
 function Agenda() {
