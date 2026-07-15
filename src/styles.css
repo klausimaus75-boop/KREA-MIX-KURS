@@ -668,6 +668,34 @@ h1 span { color: var(--rose); }
   color: #74635a;
 }
 
+.progress-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 18px;
+  margin: 12px 0 14px;
+}
+
+.progress-summary-value {
+  display: grid;
+  gap: 4px;
+}
+
+.progress-summary-value strong {
+  font-size: clamp(42px, 4vw, 68px);
+  line-height: .92;
+}
+
+.progress-summary-value span,
+.progress-summary p {
+  color: #74635a;
+  font-size: 12px;
+}
+
+.progress-summary p {
+  margin: 0 0 8px;
+}
+
 .next-step-module {
   margin: 18px 0;
   padding: 16px;
@@ -836,6 +864,11 @@ h1 span { color: var(--rose); }
   background: linear-gradient(135deg, #e87961, #cf6d51);
   font-size: 13px;
   font-weight: 800;
+}
+
+.module-cta.complete {
+  gap: 7px;
+  background: #7c9b75;
 }
 
 .photo {
@@ -1029,6 +1062,32 @@ h1 span { color: var(--rose); }
   display: grid;
   gap: 12px;
   margin: 18px 0;
+}
+
+.lesson-download {
+  width: 100%;
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(232,121,97,.24);
+  border-radius: 8px;
+  color: #684235;
+  background: rgba(255,255,255,.6);
+  text-align: left;
+  font-size: 13px;
+}
+
+.lesson-download svg {
+  color: var(--rose);
+}
+
+.lesson-download small {
+  color: #9a7b6f;
+  font-size: 10px;
+  font-weight: 850;
 }
 .lesson-list h3 {
   margin-bottom: 28px;
@@ -1675,6 +1734,21 @@ h1 span { color: var(--rose); }
   accent-color: var(--rose);
 }
 
+@media (max-width: 1180px) and (min-width: 981px) {
+  .lesson-layout,
+  .dashboard-focus {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lesson-panel {
+    min-width: 0;
+  }
+}
+
 @media (max-width: 980px) {
   .landing-page { width: 100%; min-height: auto; }
   .landing-header {
@@ -1738,6 +1812,7 @@ h1 span { color: var(--rose); }
   .video-card .photo { height: auto; max-height: none; aspect-ratio: 1 / 1; }
   .welcome { align-items: flex-start; flex-direction: column; }
   .next-step-top { align-items: flex-start; flex-direction: column; }
+  .progress-summary { grid-template-columns: 1fr; align-items: start; }
   .module-card strong { font-size: 17px; }
   .lesson-list button {
     grid-template-columns: 48px minmax(0, 1fr) 18px;
