@@ -145,6 +145,7 @@ function App() {
     setActiveLesson(lessonIndex);
     setPage("Classroom");
     setDrawer(null);
+    window.scrollTo({ top: 0, left: 0 });
   }
 
   function notify(message) {
@@ -156,6 +157,7 @@ function App() {
   function goToPage(nextPage) {
     setPage(nextPage);
     setDrawer(null);
+    window.scrollTo({ top: 0, left: 0 });
   }
 
   if (page === "Uebersicht") {
