@@ -664,7 +664,7 @@ h1 span { color: var(--rose); }
 }
 .module-grid.small { margin-top: 18px; }
 .module-card {
-  min-height: 205px;
+  min-height: 0;
   padding: 0 0 12px;
   overflow: hidden;
   text-align: left;
@@ -697,6 +697,11 @@ h1 span { color: var(--rose); }
     url("./assets/module-thumbnails.png");
   background-size: 300% 200%;
   background-position: 0% 0%;
+}
+.module-card .photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
 }
 .photo.candles { background-position: 50% 0%; filter: saturate(1.02); }
 .photo.tablet { background-position: 100% 0%; filter: saturate(.98); }
@@ -761,7 +766,7 @@ h1 span { color: var(--rose); }
 .post strong { display: block; margin-bottom: 4px; }
 .post p { margin-bottom: 8px; font-size: 13px; }
 .post span { display: flex; gap: 8px; align-items: center; color: #bd6b55; font-size: 13px; }
-.thumb { width: 150px; height: 96px; border-radius: 8px; }
+.thumb { width: 96px; height: 96px; border-radius: 8px; }
 
 .agenda { display: grid; gap: 12px; }
 .event, .member {
@@ -791,7 +796,15 @@ h1 span { color: var(--rose); }
   gap: clamp(28px, 3vw, 56px);
 }
 .video-card { padding: clamp(24px, 2vw, 36px); }
-.video-card .photo { height: clamp(440px, 42vw, 680px); border-radius: 14px; display: grid; place-items: center; }
+.video-card .photo {
+  width: 100%;
+  height: auto;
+  max-height: min(680px, 72vh);
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+}
 .video-card .photo button,
 .video-card .photo a {
   width: 74px;
@@ -1265,8 +1278,9 @@ h1 span { color: var(--rose); }
 }
 
 .admin-module-list .photo {
-  width: 110px;
-  height: 76px;
+  width: 92px;
+  height: 92px;
+  aspect-ratio: 1 / 1;
   border-radius: 10px;
 }
 
@@ -1474,7 +1488,7 @@ h1 span { color: var(--rose); }
   .top-tabs { display: none; }
   .page { padding: 24px 16px 34px; }
   .stats, .module-grid, .split, .lesson-layout, .calendar-page, .resource-grid { grid-template-columns: 1fr; }
-  .video-card .photo { height: 240px; }
+  .video-card .photo { height: auto; max-height: none; aspect-ratio: 1 / 1; }
   .welcome { align-items: flex-start; flex-direction: column; }
   .thumb { display: none; }
   .admin-login-card form { grid-template-columns: 1fr; }
@@ -1528,7 +1542,8 @@ h1 span { color: var(--rose); }
   }
   .admin-module-list .photo {
     width: 84px;
-    height: 68px;
+    height: 84px;
+    aspect-ratio: 1 / 1;
   }
   .admin-module-list em {
     grid-column: 2;
