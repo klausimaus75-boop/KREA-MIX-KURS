@@ -241,10 +241,9 @@ function Dashboard({ stats, setPage, openModule }) {
     <div className="page dashboard">
       <div className="welcome">
         <div>
-          <h1>Hallo, schoen dich zu sehen! <span>♡</span></h1>
-          <p>Hier geht's weiter, wo du aufgehoert hast.</p>
+          <h1>Hallo, sch{"\u00f6"}n dich zu sehen! <span>{"\uD83D\uDC4B"}</span></h1>
+          <p>Hier geht's weiter, wo du aufgeh{"\u00f6"}rt hast.</p>
         </div>
-        <button className="primary" onClick={() => openModule(0, 1)}><Play size={17} /> Weiterlernen</button>
       </div>
       <div className="stats">{stats.map(([n, l, Icon]) => <Glass key={l}><Icon /><strong>{n}</strong><span>{l}</span></Glass>)}</div>
       <SectionTitle title="Deine Module" action="Alle anzeigen" onClick={() => setPage("Classroom")} />
