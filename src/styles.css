@@ -15,7 +15,7 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; min-height: 100vh; }
+body { margin: 0; min-width: 320px; min-height: 100vh; overflow-x: hidden; }
 button, input { font: inherit; }
 button { cursor: pointer; }
 
@@ -36,7 +36,7 @@ body::after {
 
 .landing-page {
   position: relative;
-  width: min(2048px, 100vw);
+  width: 100%;
   min-height: 100vh;
   margin: 0 auto;
   overflow: hidden;
@@ -358,7 +358,7 @@ body::after {
 .module-hotspot-6 { left: 72.2%; top: 76.2%; height: 21%; }
 
 .app-shell {
-  width: calc(100vw - 28px);
+  width: calc(100% - 28px);
   min-height: calc(100vh - 28px);
   margin: 14px auto;
   display: grid;
