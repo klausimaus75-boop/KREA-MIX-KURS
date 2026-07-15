@@ -24,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 import "./styles.css";
+import landingPage from "./assets/landing-page.png";
 import referenceClassroom from "./assets/reference-classroom.png";
 import referenceCommunity from "./assets/reference-community.png";
 import referenceCalendar from "./assets/reference-calendar.png";
@@ -160,7 +161,7 @@ function App() {
   if (page === "Uebersicht") {
     return (
       <>
-        <DesignBoard setPage={goToPage} openModule={openModule} />
+        <LandingPage setPage={goToPage} openModule={openModule} />
         {toast && <div className="toast">{toast}</div>}
       </>
     );
@@ -223,6 +224,23 @@ function App() {
         {page === "Einstellungen" && <SettingsPage notify={notify} />}
         {toast && <div className="toast">{toast}</div>}
       </section>
+    </main>
+  );
+}
+
+function LandingPage({ setPage, openModule }) {
+  return (
+    <main className="landing-page" aria-label="KREA-MIX Landingpage">
+      <img src={landingPage} alt="KREA-MIX Landingpage" />
+      <button className="landing-hotspot landing-about" onClick={() => openModule(0)} aria-label="Ueber den Kurs" />
+      <button className="landing-hotspot landing-content" onClick={() => setPage("Classroom")} aria-label="Inhalte" />
+      <button className="landing-hotspot landing-audience" onClick={() => setPage("Community")} aria-label="Fuer wen" />
+      <button className="landing-hotspot landing-benefits" onClick={() => setPage("Mitglieder")} aria-label="Vorteile" />
+      <button className="landing-hotspot landing-faq" onClick={() => setPage("Ressourcen")} aria-label="FAQ" />
+      <button className="landing-hotspot landing-login" onClick={() => setPage("Einstellungen")} aria-label="Anmelden" />
+      <button className="landing-hotspot landing-start-top" onClick={() => setPage("Classroom")} aria-label="Jetzt starten" />
+      <button className="landing-hotspot landing-start-main" onClick={() => setPage("Classroom")} aria-label="Jetzt Mitglied werden" />
+      <button className="landing-hotspot landing-more" onClick={() => openModule(0)} aria-label="Mehr erfahren" />
     </main>
   );
 }
