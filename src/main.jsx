@@ -67,6 +67,7 @@ import { ModulePhoto } from "./components/course/ModulePhoto";
 import { NextLessonCard } from "./components/course/NextLessonCard";
 import { ToolsSection } from "./components/course/ToolsSection";
 import { AccountAvatar, AuthModal } from "./components/auth/AuthModal";
+import { CoursePreviewModal } from "./components/preview/CoursePreviewModal";
 import { useAuth } from "./hooks/useAuth";
 import { useCourseProgress } from "./hooks/useCourseProgress";
 
@@ -108,6 +109,7 @@ function App() {
   const [drawer, setDrawer] = useState(null);
   const [toast, setToast] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [enteredCourse, setEnteredCourse] = useState(() => Boolean(initialRoute));
   const progressSummary = useMemo(() => getProgressSummary(completedLessons), [completedLessons]);
   const nextLesson = useMemo(() => getNextLesson(completedLessons), [completedLessons]);
@@ -170,6 +172,10 @@ function App() {
       window.removeEventListener("popstate", syncCourseRoute);
     };
   }, []);
+
+  useEffect(() => {
+    if (auth.user) setAuthOpen(false);
+  }, [auth.user]);
 
   function updateHash(hash, replace = false) {
     if (window.location.hash === hash) return;
@@ -242,6 +248,19 @@ function App() {
     window.scrollTo({ top: 0, left: 0 });
   }
 
+  function showPublicPreview() {
+    goToLanding();
+    setPreviewOpen(true);
+  }
+
+  function openMemberAccess() {
+    if (auth.user) {
+      goToPage("Übersicht");
+      return;
+    }
+    setAuthOpen(true);
+  }
+
   async function markLessonComplete(moduleIndex = activeModule, lessonIndex = activeLesson) {
     const result = await completeLesson(moduleIndex, lessonIndex);
     if (result.error) notify(result.error);
@@ -268,9 +287,33 @@ function App() {
   if (page === "Übersicht" && !enteredCourse) {
     return (
       <>
-        <LandingPage setPage={goToPage} openModule={openModule} onAuthOpen={() => setAuthOpen(true)} />
+        <LandingPage onPreview={() => setPreviewOpen(true)} onMemberAccess={openMemberAccess} />
+        <CoursePreviewModal
+          open={previewOpen}
+          heroImage={heroGenerated}
+          phases={coursePhases}
+          onClose={() => setPreviewOpen(false)}
+          onSignIn={() => {
+            setPreviewOpen(false);
+            setAuthOpen(true);
+          }}
+        />
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} auth={auth} syncStatus={syncStatus} />
         {toast && <div className="toast">{toast}</div>}
+      </>
+    );
+  }
+
+  if (!auth.user) {
+    return (
+      <>
+        <MemberGate
+          loading={auth.loading}
+          goToLanding={goToLanding}
+          onPreview={showPublicPreview}
+          onAuthOpen={() => setAuthOpen(true)}
+        />
+        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} auth={auth} syncStatus={syncStatus} />
       </>
     );
   }
@@ -367,28 +410,28 @@ function App() {
   );
 }
 
-function LandingPage({ setPage, openModule, onAuthOpen }) {
+function LandingPage({ onPreview, onMemberAccess }) {
   const features = [
-    [BookOpen, "Strukturierte Module", "Alles Schritt für Schritt erklärt", () => setPage("Classroom")],
-    [Users, "Community", "Tausche dich mit anderen aus", () => setPage("Community")],
-    [CalendarDays, "Flexibel lernen", "Lerne wann und wo du willst", () => setPage("Kalender")],
-    [Star, "Praxis & Ergebnisse", "Weniger Theorie, mehr Umsetzung", () => openModule(0)],
+    [BookOpen, "Strukturierte Module", "Alles Schritt für Schritt erklärt"],
+    [Users, "Community", "Tausche dich mit anderen aus"],
+    [CalendarDays, "Flexibel lernen", "Lerne wann und wo du willst"],
+    [Star, "Praxis & Ergebnisse", "Weniger Theorie, mehr Umsetzung"],
   ];
 
   return (
     <main className="landing-page" aria-label="KREA-MIX Landingpage">
       <header className="landing-header">
-        <button className="landing-brand" onClick={() => setPage("Übersicht")}>KREA-MIX<span>*</span></button>
+        <div className="landing-brand">KREA-MIX<span>*</span></div>
         <nav className="landing-nav" aria-label="Landing Navigation">
-          <button onClick={() => openModule(0)}>Über den Kurs</button>
-          <button onClick={() => setPage("Classroom")}>Inhalte</button>
-          <button onClick={() => setPage("Community")}>Für wen?</button>
-          <button onClick={() => setPage("Mitglieder")}>Vorteile</button>
-          <button onClick={() => setPage("Ressourcen")}>FAQ</button>
+          <button onClick={onPreview}>Über den Kurs</button>
+          <button onClick={onPreview}>Inhalte</button>
+          <button onClick={onPreview}>Für wen?</button>
+          <button onClick={onPreview}>Vorteile</button>
+          <button onClick={onPreview}>FAQ</button>
         </nav>
         <div className="landing-actions">
-          <button className="landing-outline" onClick={onAuthOpen}>Anmelden</button>
-          <button className="landing-solid" onClick={() => setPage("Übersicht")}>Jetzt starten</button>
+          <button className="landing-outline" onClick={onMemberAccess}>Anmelden</button>
+          <button className="landing-solid" onClick={onMemberAccess}>Jetzt starten</button>
         </div>
       </header>
 
@@ -404,20 +447,49 @@ function LandingPage({ setPage, openModule, onAuthOpen }) {
             <li><Check size={15} /> Community & Support</li>
           </ul>
           <div className="landing-cta-row">
-            <button className="landing-main-cta" onClick={onAuthOpen}>Jetzt Mitglied werden <ChevronRight size={18} /></button>
-            <button className="landing-secondary-cta" onClick={() => openModule(0)}><Play size={16} /> Mehr erfahren</button>
+            <button className="landing-main-cta" onClick={onMemberAccess}>Jetzt Mitglied werden <ChevronRight size={18} /></button>
+            <button className="landing-secondary-cta" onClick={onPreview}><Play size={16} /> Kurs ansehen</button>
           </div>
         </div>
       </section>
 
       <section className="landing-feature-row" aria-label="Kursvorteile">
-        {features.map(([Icon, title, text, action]) => (
-          <button className="landing-feature" key={title} onClick={action}>
+        {features.map(([Icon, title, text]) => (
+          <button className="landing-feature" key={title} onClick={onPreview}>
             <Icon size={34} />
             <strong>{title}</strong>
             <span>{text}</span>
           </button>
         ))}
+      </section>
+    </main>
+  );
+}
+
+function MemberGate({ loading, goToLanding, onPreview, onAuthOpen }) {
+  return (
+    <main className="member-gate">
+      <header className="member-gate-header">
+        <button className="landing-brand" onClick={goToLanding}>KREA-MIX<span>*</span></button>
+        <button className="landing-outline" onClick={goToLanding}><ChevronLeft size={16} /> Zur Startseite</button>
+      </header>
+
+      <section className="member-gate-card">
+        <div className="member-gate-icon"><Lock size={30} /></div>
+        <span>Geschützter Mitgliederbereich</span>
+        <h1>{loading ? "Zugang wird geprüft" : "Dein Kurs beginnt nach der Anmeldung"}</h1>
+        <p>
+          {loading
+            ? "Wir prüfen gerade, ob auf diesem Gerät bereits eine aktive Sitzung besteht."
+            : "Dashboard, Module, Lektionen, Community, Kalender und Ressourcen sind ausschließlich für angemeldete Mitglieder verfügbar."}
+        </p>
+        {!loading && (
+          <div className="member-gate-actions">
+            <button className="member-gate-primary" onClick={onAuthOpen}><LogIn size={18} /> Anmelden oder Account erstellen</button>
+            <button className="member-gate-secondary" onClick={onPreview}><Play size={17} /> Kursvorschau ansehen</button>
+          </div>
+        )}
+        <div className="member-gate-security"><ShieldCheck size={17} /> Dein Lernfortschritt wird nach der Anmeldung sicher deinem Account zugeordnet.</div>
       </section>
     </main>
   );
