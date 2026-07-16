@@ -5,6 +5,7 @@ dist/
 !.env.example
 *.png
 !src/assets/*.png
+!src/assets/brand/*.png
 !assets/*.png
 !src/assets/modules/*.webp
 .DS_Store

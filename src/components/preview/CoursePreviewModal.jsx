@@ -33,8 +33,8 @@ export function CoursePreviewModal({ open, heroImage, phases, onClose, onSignIn 
           <X size={18} />
         </button>
 
-        <div className="preview-trailer" aria-label="KREA-MIX Kurs-Trailer Vorschau">
-          <img src={heroImage} alt="KREA-MIX Kursvorschau am kreativen Arbeitsplatz" />
+        <div className="preview-trailer" aria-label="KreaMix Kurs-Trailer Vorschau">
+          <img src={heroImage} alt="KreaMix Kursvorschau mit Aquarellbuch und Blumen" />
           <div className="preview-trailer-label">
             <span><Play size={18} fill="currentColor" /></span>
             <div>
@@ -45,7 +45,7 @@ export function CoursePreviewModal({ open, heroImage, phases, onClose, onSignIn 
         </div>
 
         <div className="preview-content">
-          <div className="preview-eyebrow"><Sparkles size={15} /> KREA-MIX Kursvorschau</div>
+          <div className="preview-eyebrow"><Sparkles size={15} /> KreaMix Kursvorschau</div>
           <h2 id="course-preview-title">Von deiner Buchidee bis zu deinem eigenen System</h2>
           <p>
             Du entwickelst dein Buch Schritt für Schritt, bereitest es für Amazon KDP vor und baust daraus einen Ablauf,

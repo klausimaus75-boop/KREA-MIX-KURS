@@ -31,7 +31,7 @@ import {
   X,
 } from "lucide-react";
 import "./styles.css";
-import heroGenerated from "./assets/hero-generated-2k.png";
+import watercolorHero from "./assets/brand/kreamix-brand-hero.png";
 import referenceClassroom from "./assets/reference-classroom.png";
 import referenceCommunity from "./assets/reference-community.png";
 import referenceCalendar from "./assets/reference-calendar.png";
@@ -290,7 +290,7 @@ function App() {
         <LandingPage onPreview={() => setPreviewOpen(true)} onMemberAccess={openMemberAccess} />
         <CoursePreviewModal
           open={previewOpen}
-          heroImage={heroGenerated}
+          heroImage={watercolorHero}
           phases={coursePhases}
           onClose={() => setPreviewOpen(false)}
           onSignIn={() => {
@@ -321,7 +321,7 @@ function App() {
   return (
     <main className="app-shell" data-version="pages-fix-1">
       <aside className="sidebar">
-        <button className="brand" onClick={() => goToPage("Übersicht")}>KREA-MIX<span>*</span></button>
+        <button className="brand" onClick={() => goToPage("Übersicht")}>KreaMix<span>*</span></button>
         <nav>
           {nav.map(([label, Icon]) => (
             <button className={page === label ? "active" : ""} onClick={() => goToPage(label)} key={label}>
@@ -417,17 +417,32 @@ function LandingPage({ onPreview, onMemberAccess }) {
     [CalendarDays, "Flexibel lernen", "Lerne wann und wo du willst"],
     [Star, "Praxis & Ergebnisse", "Weniger Theorie, mehr Umsetzung"],
   ];
+  const testimonials = [
+    ["Anna M.", "Ich habe endlich einen klaren Weg von meiner Idee bis zum fertigen Buch. Jede Lektion gibt mir genau den nächsten machbaren Schritt."],
+    ["Julia P.", "KreaMix verbindet Kreativität und Struktur so angenehm, dass ich wirklich dranbleibe und mein Projekt nicht mehr aufschiebe."],
+    ["Sophie L.", "Die Module fühlen sich persönlich an, sind übersichtlich aufgebaut und lassen sich wunderbar in meinen Alltag integrieren."],
+  ];
+  const faqItems = [
+    ["Brauche ich Vorkenntnisse?", "Nein. Der Kurs beginnt bewusst bei den Grundlagen und führt dich Schritt für Schritt durch Buchidee, Gestaltung, KDP und Vermarktung."],
+    ["Kann ich in meinem eigenen Tempo lernen?", "Ja. Deine Fortschritte werden in deinem persönlichen Account gespeichert und du setzt jederzeit an der letzten Lektion fort."],
+    ["Was bekomme ich nach der Anmeldung?", "Du erhältst Zugriff auf alle freigeschalteten Module, Lektionen, Ressourcen, Community-Bereiche und deinen persönlichen Fortschritt."],
+    ["Kann ich den Kurs zuerst ansehen?", "Ja. Die Kursvorschau zeigt dir Aufbau, Lernweg und Inhalte. Die vollständigen Lernmodule bleiben dem geschützten Mitgliederbereich vorbehalten."],
+  ];
+
+  function scrollToLandingSection(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
-    <main className="landing-page" aria-label="KREA-MIX Landingpage">
+    <main className="landing-page" aria-label="KreaMix Landingpage">
       <header className="landing-header">
-        <div className="landing-brand">KREA-MIX<span>*</span></div>
+        <div className="landing-brand">KreaMix<span>*</span></div>
         <nav className="landing-nav" aria-label="Landing Navigation">
-          <button onClick={onPreview}>Über den Kurs</button>
-          <button onClick={onPreview}>Inhalte</button>
-          <button onClick={onPreview}>Für wen?</button>
-          <button onClick={onPreview}>Vorteile</button>
-          <button onClick={onPreview}>FAQ</button>
+          <button onClick={() => scrollToLandingSection("landing-about")}>Über den Kurs</button>
+          <button onClick={() => scrollToLandingSection("landing-modules")}>Inhalte</button>
+          <button onClick={() => scrollToLandingSection("landing-audience")}>Für wen?</button>
+          <button onClick={() => scrollToLandingSection("landing-benefits")}>Vorteile</button>
+          <button onClick={() => scrollToLandingSection("landing-faq")}>FAQ</button>
         </nav>
         <div className="landing-actions">
           <button className="landing-outline" onClick={onMemberAccess}>Anmelden</button>
@@ -435,8 +450,8 @@ function LandingPage({ onPreview, onMemberAccess }) {
         </div>
       </header>
 
-      <section className="landing-hero">
-        <img className="landing-hero-image" src={heroGenerated} alt="" />
+      <section className="landing-hero" id="landing-about">
+        <img className="landing-hero-image" src={watercolorHero} alt="Aquarelliertes Skizzenbuch mit Blumen und Pinseln" />
         <div className="landing-copy">
           <div className="landing-pill"><Heart size={15} /> Dein kreativer Online-Kurs</div>
           <h1>Kreativit{"\u00e4"}t trifft<br />Strategie - dein Weg<br />zu mehr <span>Erfolg</span></h1>
@@ -453,7 +468,7 @@ function LandingPage({ onPreview, onMemberAccess }) {
         </div>
       </section>
 
-      <section className="landing-feature-row" aria-label="Kursvorteile">
+      <section className="landing-feature-row" id="landing-benefits" aria-label="Kursvorteile">
         {features.map(([Icon, title, text]) => (
           <button className="landing-feature" key={title} onClick={onPreview}>
             <Icon size={34} />
@@ -462,6 +477,78 @@ function LandingPage({ onPreview, onMemberAccess }) {
           </button>
         ))}
       </section>
+
+      <section className="landing-section landing-modules" id="landing-modules">
+        <div className="landing-section-heading">
+          <span>Dein kreativer Weg</span>
+          <h2>Module, die dich ins Tun bringen</h2>
+          <p>Du arbeitest in einer klaren Reihenfolge und verwandelst deine Idee Schritt für Schritt in ein professionelles Buchprojekt.</p>
+        </div>
+        <div className="landing-module-grid">
+          {modules.slice(0, 3).map((module) => (
+            <article className="landing-module-card" key={module.id}>
+              <div className="landing-module-image" style={{ backgroundImage: `url("${module.image}")` }} />
+              <div>
+                <span>Modul {module.number}</span>
+                <h3>{module.title}</h3>
+                <p>{module.subtitle}</p>
+                <button onClick={onPreview}>Mehr entdecken <ChevronRight size={16} /></button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-section landing-testimonials" id="landing-audience">
+        <div className="landing-section-heading compact">
+          <span>Für kreative Macherinnen</span>
+          <h2>Du musst nicht perfekt starten</h2>
+          <p>Der Kurs ist für dich, wenn du eine Buchidee im Herzen trägst und dir einen klaren, freundlichen Prozess wünschst.</p>
+        </div>
+        <div className="landing-quote-grid">
+          {testimonials.map(([name, quote]) => (
+            <blockquote key={name}>
+              <strong>“</strong>
+              <p>{quote}</p>
+              <footer>{name}</footer>
+            </blockquote>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-section landing-faq" id="landing-faq">
+        <div className="landing-section-heading compact">
+          <span>Gut zu wissen</span>
+          <h2>Häufige Fragen</h2>
+        </div>
+        <div className="landing-faq-list">
+          {faqItems.map(([question, answer], index) => (
+            <details key={question} open={index === 0}>
+              <summary>{question}<Plus size={18} /></summary>
+              <p>{answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-final-cta">
+        <div>
+          <span>Deine Ideen. Dein Buch. Dein Erfolg.</span>
+          <h2>Bereit, deinem Buch Raum zu geben?</h2>
+          <p>Starte mit einem klaren System und bleibe trotzdem ganz bei deiner eigenen kreativen Handschrift.</p>
+        </div>
+        <button onClick={onMemberAccess}>Jetzt kreativ werden <ChevronRight size={18} /></button>
+      </section>
+
+      <footer className="landing-footer">
+        <button className="landing-brand" onClick={() => scrollToLandingSection("landing-about")}>KreaMix<span>*</span></button>
+        <p>Träume zwischen zwei Buchdeckeln.</p>
+        <div>
+          <button onClick={onPreview}>Kursvorschau</button>
+          <button onClick={onMemberAccess}>Anmelden</button>
+          <span>© {new Date().getFullYear()} KreaMix</span>
+        </div>
+      </footer>
     </main>
   );
 }
@@ -470,7 +557,7 @@ function MemberGate({ loading, goToLanding, onPreview, onAuthOpen }) {
   return (
     <main className="member-gate">
       <header className="member-gate-header">
-        <button className="landing-brand" onClick={goToLanding}>KREA-MIX<span>*</span></button>
+        <button className="landing-brand" onClick={goToLanding}>KreaMix<span>*</span></button>
         <button className="landing-outline" onClick={goToLanding}><ChevronLeft size={16} /> Zur Startseite</button>
       </header>
 
@@ -549,7 +636,7 @@ function AdminGate({ auth, goToLanding, onAuthOpen }) {
       <section className="admin-login-card">
         <button className="admin-back" onClick={goToLanding}><ChevronLeft size={16} /> Zur Landingpage</button>
         <div className="admin-lock"><Lock size={34} /></div>
-        <span>KREA-MIX Admin</span>
+        <span>KreaMix Admin</span>
         <h1>{loading ? "Berechtigung wird geprüft" : "Geschützter Verwaltungsbereich"}</h1>
         <p>
           {loading
@@ -586,7 +673,7 @@ function AdminPage({ modules, auth, goToPage, goToLanding, notify }) {
   return (
     <main className="admin-shell">
       <aside className="admin-sidebar">
-        <button className="admin-brand" onClick={goToLanding}>KREA-MIX<span>*</span></button>
+        <button className="admin-brand" onClick={goToLanding}>KreaMix<span>*</span></button>
         <div className="admin-owner">
           <UserCog size={18} />
           <AccountAvatar auth={auth} size="small" />
