@@ -10,6 +10,7 @@ export function ModuleDetailPage({
   completedLessons,
   onBack,
   onLesson,
+  onOpenModule,
 }) {
   const progress = getModuleProgress(moduleIndex, completedLessons);
   const firstOpenLesson = module.lessons.findIndex((lesson) => !completedLessons.has(lesson.id));
@@ -32,7 +33,7 @@ export function ModuleDetailPage({
         <ModulePhoto module={module} />
         <div>
           <span>PHASE {phase.number} · MODUL {module.number}</span>
-          <h1>{module.title}</h1>
+          <h1>{module.fullTitle || module.title}</h1>
           <strong>{module.subtitle}</strong>
           <p>{module.introduction}</p>
         </div>
@@ -78,14 +79,18 @@ export function ModuleDetailPage({
         <div className="module-lesson-list">
           {module.lessons.map((lesson, lessonIndex) => {
             const complete = completedLessons.has(lesson.id);
+            const isCurrent = !complete && lessonIndex === continueIndex;
             return (
               <button key={lesson.id} onClick={() => onLesson(lessonIndex)}>
                 <span>{String(lesson.number).padStart(2, "0")}</span>
                 <div>
                   <strong>{lesson.title}</strong>
+                  <p>{lesson.shortDescription}</p>
                   <small><Clock3 size={13} /> {lesson.estimatedDuration} · {lesson.videoType}</small>
                 </div>
-                <em className={complete ? "complete" : ""}>{complete ? <><Check size={14} /> Erledigt</> : "Offen"}</em>
+                <em className={complete ? "complete" : isCurrent ? "current" : ""}>
+                  {complete ? <><Check size={14} /> Abgeschlossen</> : isCurrent ? "In Bearbeitung" : "Offen"}
+                </em>
                 <ChevronRight size={17} />
               </button>
             );
@@ -96,7 +101,23 @@ export function ModuleDetailPage({
       {progress.percent === 100 && module.completionMessage ? (
         <section className="module-completion">
           <Check size={22} />
-          <div><span>MODUL ABGESCHLOSSEN</span><p>{module.completionMessage}</p></div>
+          <div>
+            <span>MODUL ABGESCHLOSSEN</span>
+            <h2>Modul 1 abgeschlossen</h2>
+            <p>{module.completionMessage}</p>
+            {module.completionChecklist?.length ? (
+              <ul>
+                {module.completionChecklist.map((item) => <li key={item}><Check size={15} /> {item}</li>)}
+              </ul>
+            ) : null}
+            {module.nextModuleNumber ? (
+              <button className="primary" onClick={() => onOpenModule?.(module.nextModuleNumber - 1)}>
+                Weiter zu Modul {module.nextModuleNumber}
+              </button>
+            ) : (
+              <button className="primary" disabled>Modul 2 folgt</button>
+            )}
+          </div>
         </section>
       ) : null}
 

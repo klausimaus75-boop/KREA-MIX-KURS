@@ -921,6 +921,7 @@ function Classroom({
         completedLessons={completedLessons}
         onBack={openClassroom}
         onLesson={(lessonIndex) => openLesson(activeModule, lessonIndex)}
+        onOpenModule={openModule}
       />
     );
   }

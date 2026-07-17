@@ -1517,6 +1517,13 @@ h1 span { color: var(--rose); }
   font-size: 16px;
 }
 
+.module-lesson-list > button p {
+  margin: 4px 0 0;
+  color: #6f5b52;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .module-lesson-list > button small {
   display: flex;
   align-items: center;
@@ -1538,6 +1545,10 @@ h1 span { color: var(--rose); }
 
 .module-lesson-list > button em.complete {
   color: #688260;
+}
+
+.module-lesson-list > button em.current {
+  color: var(--brand-pink);
 }
 
 .module-completion,
@@ -1563,6 +1574,34 @@ h1 span { color: var(--rose); }
   margin: 5px 0 0;
   color: #52654e;
   line-height: 1.55;
+}
+
+.module-completion h2 {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 24px;
+}
+
+.module-completion ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.module-completion li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #52654e;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.module-completion button {
+  margin-top: 18px;
 }
 
 .module-primary-action {
@@ -3298,7 +3337,8 @@ h1 span { color: var(--rose); }
   .module-detail-grid,
   .lesson-page-grid,
   .lesson-foundation-grid,
-  .lesson-checklist ul {
+  .lesson-checklist ul,
+  .module-completion ul {
     grid-template-columns: minmax(0, 1fr);
   }
   .catalog-header,

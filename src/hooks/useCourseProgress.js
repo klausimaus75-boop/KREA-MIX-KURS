@@ -12,7 +12,7 @@ function storageKey(userId) {
 
 function readProgress(userId) {
   try {
-    const value = JSON.parse(sessionStorage.getItem(storageKey(userId)) || "[]");
+    const value = JSON.parse(localStorage.getItem(storageKey(userId)) || "[]");
     return new Set([...normalizeStoredProgress(Array.isArray(value) ? value : [])].filter((id) => validLessonIds.has(id)));
   } catch {
     return new Set();
@@ -20,7 +20,7 @@ function readProgress(userId) {
 }
 
 function persistProgress(progress, userId) {
-  sessionStorage.setItem(storageKey(userId), JSON.stringify([...progress]));
+  localStorage.setItem(storageKey(userId), JSON.stringify([...progress]));
 }
 
 export function useCourseProgress(user) {
@@ -56,7 +56,7 @@ export function useCourseProgress(user) {
       const remoteProgress = new Set((data || []).map((row) => row.lesson_id).filter((id) => validLessonIds.has(id)));
       const accountBackup = readProgress(userId);
       const migrationKey = `kreaProgressMigrated:${userId}`;
-      const shouldMigrateAnonymous = sessionStorage.getItem(migrationKey) !== "true";
+      const shouldMigrateAnonymous = localStorage.getItem(migrationKey) !== "true";
       const anonymousProgress = shouldMigrateAnonymous ? readProgress(null) : new Set();
       const mergedProgress = new Set([...remoteProgress, ...accountBackup, ...anonymousProgress]);
       const missingRemote = [...mergedProgress].filter((id) => !remoteProgress.has(id));
@@ -78,8 +78,8 @@ export function useCourseProgress(user) {
       if (!active) return;
       setCompletedLessons(mergedProgress);
       persistProgress(mergedProgress, userId);
-      sessionStorage.setItem(migrationKey, "true");
-      if (shouldMigrateAnonymous) sessionStorage.removeItem(ANONYMOUS_PROGRESS_KEY);
+      localStorage.setItem(migrationKey, "true");
+      if (shouldMigrateAnonymous) localStorage.removeItem(ANONYMOUS_PROGRESS_KEY);
 
       channel = supabase
         .channel(`lesson-progress:${userId}`)
