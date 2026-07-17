@@ -4388,6 +4388,30 @@ select:focus-visible {
   color: var(--brand-navy);
 }
 
+@media (min-width: 981px) {
+  .landing-copy {
+    width: min(600px, 38vw);
+  }
+
+  .landing-copy h1 {
+    max-width: 100%;
+    font-size: clamp(52px, 4.35vw, 70px);
+  }
+
+  .landing-cta-row {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .landing-main-cta,
+  .landing-secondary-cta {
+    min-height: 52px;
+    padding-inline: 14px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
+
 .landing-copy h1 span {
   font-family: "Caveat", "Segoe Print", cursive;
   font-size: 1.04em;

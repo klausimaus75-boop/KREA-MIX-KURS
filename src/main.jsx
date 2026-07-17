@@ -454,7 +454,7 @@ function LandingPage({ onPreview, onMemberAccess }) {
         <img className="landing-hero-image" src={watercolorHero} alt="Aquarelliertes Skizzenbuch mit Blumen und Pinseln" />
         <div className="landing-copy">
           <div className="landing-pill"><Heart size={15} /> Dein kreativer Online-Kurs</div>
-          <h1>Kreativit{"\u00e4"}t trifft<br />Strategie - dein Weg<br />zu mehr <span>Erfolg</span></h1>
+          <h1>Kreativit{"\u00e4"}t trifft<br />Strategie - dein<br />Weg zu mehr <span>Erfolg</span></h1>
           <p>Lerne Schritt f{"\u00fc"}r Schritt, wie du deine Ideen umsetzt, sichtbar wirst und dein Herzensprojekt erfolgreich aufbaust.</p>
           <ul>
             <li><Check size={15} /> Praxisnahe Module</li>
