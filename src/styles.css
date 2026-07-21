@@ -5512,8 +5512,10 @@ nav button.active svg,
 }
 
 .author-journey strong {
-  font-size: 15px;
+  max-width: 112px;
+  font-size: 13px;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .author-start-banner {
@@ -6451,6 +6453,286 @@ nav button.active svg,
   background: var(--author-primary);
   box-shadow: 0 13px 26px rgba(61, 50, 245, .22);
   font-weight: 850;
+}
+
+/* KreaMix landing design applied to the course/project workspace */
+.author-shell {
+  --author-bg: rgba(255, 248, 243, .74);
+  --author-panel: rgba(255, 255, 255, .9);
+  --author-soft: var(--rose-soft);
+  --author-line: rgba(29, 42, 99, .1);
+  --author-text: var(--brand-navy);
+  --author-muted: var(--muted);
+  --author-primary: var(--brand-pink);
+  --author-primary-2: #cf2478;
+  --author-primary-soft: var(--rose-soft);
+  --author-warning: var(--brand-peach);
+  background-image:
+    linear-gradient(110deg, rgba(255, 248, 243, .92), rgba(250, 244, 251, .9)),
+    url("./assets/brand/kreamix-brand-watercolor-bg.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.author-sidebar {
+  border-color: rgba(29, 42, 99, .1);
+  background-image:
+    linear-gradient(180deg, rgba(255, 248, 243, .97), rgba(250, 244, 251, .95)),
+    url("./assets/brand/kreamix-brand-watercolor-bg.png");
+  background-size: auto, 980px auto;
+  background-position: center, left bottom;
+}
+
+.author-logo {
+  color: var(--brand-navy);
+}
+
+.author-logo-mark,
+.author-avatar,
+.author-profile span {
+  color: #fff;
+  background: var(--brand-pink);
+  box-shadow: 0 12px 26px rgba(231, 55, 140, .2);
+}
+
+.author-logo strong {
+  font-family: "Caveat", "Segoe Print", cursive;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: .9;
+  color: transparent;
+  background: linear-gradient(90deg, var(--brand-pink) 0 48%, var(--brand-navy) 48% 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.author-logo small,
+.author-nav > span,
+.author-collapse {
+  color: var(--muted) !important;
+}
+
+.author-nav button,
+.author-sidebar-footer button,
+.author-shortcuts button,
+.project-wizard-actions > button:not(.author-primary),
+.project-overview-actions button,
+.project-files-card button {
+  color: var(--brand-navy);
+  border-color: rgba(29, 42, 99, .12);
+}
+
+.author-nav button.active,
+.author-nav button.active-stage {
+  color: var(--brand-pink);
+  background: linear-gradient(90deg, rgba(252, 232, 241, .95), rgba(241, 235, 251, .82));
+  box-shadow: inset 3px 0 0 var(--brand-pink);
+}
+
+.author-nav button.active svg,
+.author-nav button.active-stage svg,
+.wizard-choice svg,
+.planning-step-heading svg,
+.planning-side .author-card > svg,
+.project-activity-card svg {
+  color: var(--brand-pink);
+}
+
+.author-main {
+  background: rgba(255, 248, 243, .62);
+}
+
+.author-topbar {
+  border-color: rgba(29, 42, 99, .09);
+  background: rgba(255, 248, 243, .9);
+  box-shadow: 0 8px 26px rgba(29, 42, 99, .055);
+}
+
+.author-search,
+.wizard-field input,
+.wizard-field textarea,
+.planning-field textarea {
+  border-color: rgba(29, 42, 99, .12);
+  color: var(--brand-navy);
+  background: rgba(255, 255, 255, .88);
+}
+
+.author-welcome h1,
+.project-wizard-head h1,
+.project-overview-head h1,
+.planning-hero h1 {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-weight: 400;
+  color: var(--brand-navy);
+}
+
+.author-welcome p,
+.project-wizard-head p,
+.project-overview-head p,
+.planning-step-heading p,
+.author-empty-card p,
+.author-project-card p,
+.author-card p,
+.author-help-card p {
+  color: var(--muted);
+}
+
+.author-card,
+.author-project-card,
+.author-start-banner,
+.project-wizard-card,
+.project-next-card,
+.planning-main-card,
+.planning-side .author-card {
+  border-color: rgba(29, 42, 99, .1);
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 14px 34px rgba(29, 42, 99, .08), inset 0 1px 0 #fff;
+}
+
+.author-card h2,
+.author-card-head h2,
+.author-help-card h2,
+.author-section-title,
+.project-wizard-card h2,
+.project-overview-page h2,
+.wizard-step h3,
+.planning-step-heading h2,
+.planning-side h2,
+.author-empty-card h3,
+.author-project-card h3 {
+  color: var(--brand-navy);
+}
+
+.author-card-head strong,
+.author-project-card span,
+.summary-grid button,
+.author-link,
+.project-overview-head span {
+  color: var(--brand-pink);
+}
+
+.author-journey::before {
+  background: repeating-linear-gradient(90deg, rgba(29, 42, 99, .16) 0 8px, transparent 8px 15px);
+}
+
+.author-journey::after,
+.progress-line span,
+.mini-progress span,
+.module-progress-track span,
+.lesson-side-progress span,
+.foundation-progress-track span {
+  background: var(--brand-pink);
+}
+
+.author-journey .active span,
+.project-road .active span,
+.project-road .done span,
+.project-wizard-progress .active span,
+.project-wizard-progress .done span {
+  color: #fff;
+  background: var(--brand-pink);
+  box-shadow: 0 11px 22px rgba(231, 55, 140, .24);
+}
+
+.author-start-banner,
+.project-next-card,
+.planning-hero {
+  color: #fff;
+  background:
+    radial-gradient(circle at 90% 16%, rgba(245, 176, 155, .36), transparent 28%),
+    linear-gradient(135deg, var(--brand-pink), #c84c8c 52%, #8f72af);
+  box-shadow: 0 18px 38px rgba(231, 55, 140, .2);
+}
+
+.author-start-banner button,
+.project-next-card .author-primary,
+.planning-hero .author-primary {
+  color: var(--brand-pink);
+  background: rgba(255, 255, 255, .94);
+}
+
+.author-primary,
+.planning-next,
+.project-overview-actions .author-primary {
+  color: #fff;
+  background: var(--brand-pink);
+  box-shadow: 0 13px 26px rgba(231, 55, 140, .2);
+}
+
+.author-primary:hover,
+.planning-next:hover,
+.project-overview-actions .author-primary:hover {
+  background: #cf2478;
+}
+
+.author-plus,
+.author-empty-icon,
+.project-overview-head span,
+.wizard-choice.selected,
+.project-wizard-progress .active,
+.wizard-hint,
+.wizard-note {
+  color: var(--brand-pink);
+  background: var(--rose-soft);
+}
+
+.author-help-card {
+  border-color: rgba(231, 55, 140, .18);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 243, .96), rgba(252, 232, 241, .75)),
+    url("./assets/brand/kreamix-brand-watercolor-bg.png");
+  background-size: cover;
+}
+
+.author-help-icon,
+.author-help-card button span,
+.author-top-actions i {
+  background: var(--brand-pink);
+}
+
+.author-help-card button {
+  border-color: rgba(231, 55, 140, .24);
+  color: var(--brand-navy);
+  background: rgba(255, 255, 255, .86);
+}
+
+.author-progress-ring {
+  background: conic-gradient(var(--brand-pink) var(--progress), #e9e0ef 0);
+}
+
+.author-progress-ring::after {
+  background: var(--brand-cream);
+}
+
+.author-progress-row dt.work::before {
+  background: var(--brand-peach);
+}
+
+.wizard-choice,
+.project-wizard-progress button,
+.summary-grid > div,
+.project-files-card div {
+  border-color: rgba(29, 42, 99, .1);
+  background: rgba(255, 255, 255, .86);
+}
+
+.wizard-choice.selected {
+  border-color: rgba(231, 55, 140, .34);
+  box-shadow: inset 3px 0 0 var(--brand-pink);
+}
+
+.project-files-card div {
+  color: var(--muted);
+  background: rgba(252, 232, 241, .52);
+}
+
+.project-info-card dl div,
+.planning-facts div {
+  border-bottom-color: rgba(29, 42, 99, .1);
+}
+
+.planning-checklist svg {
+  color: var(--brand-pink);
 }
 
 @media (max-width: 1180px) {
