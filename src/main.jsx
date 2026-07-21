@@ -54,10 +54,15 @@ import {
 } from "./lib/courseProgress";
 import {
   classroomHash,
+  dashboardHash,
   lessonHash,
   moduleHash,
   parseCourseHash,
+  projectEditHash,
+  projectHash,
+  projectNewHash,
 } from "./lib/courseRoutes";
+import { getProjectById, getProjects } from "./lib/projectStore";
 import { BookProjectCard } from "./components/course/BookProjectCard";
 import { ClassroomCatalog } from "./components/course/ClassroomCatalog";
 import { LessonPage } from "./components/course/LessonPage";
@@ -68,6 +73,9 @@ import { NextLessonCard } from "./components/course/NextLessonCard";
 import { ToolsSection } from "./components/course/ToolsSection";
 import { AccountAvatar, AuthModal } from "./components/auth/AuthModal";
 import { CoursePreviewModal } from "./components/preview/CoursePreviewModal";
+import { AuthorDashboard } from "./components/projects/AuthorDashboard";
+import { ProjectOverviewPage } from "./components/projects/ProjectOverviewPage";
+import { ProjectWizard } from "./components/projects/ProjectWizard";
 import { useAuth } from "./hooks/useAuth";
 import { useCourseProgress } from "./hooks/useCourseProgress";
 
@@ -101,8 +109,12 @@ const initialLessonIndex = Number.isInteger(initialRoute?.lessonIndex) && module
 function App() {
   const auth = useAuth();
   const { completedLessons, completeLesson, syncStatus, syncError } = useCourseProgress(auth.user);
+  const isInitialCourseRoute = ["catalog", "module", "lesson"].includes(initialRoute?.type);
+  const isInitialProjectRoute = ["dashboard", "project-new", "project", "project-edit"].includes(initialRoute?.type);
   const [page, setPage] = useState(() => initialRoute?.type === "admin" ? "Admin" : initialRoute ? "Classroom" : "Übersicht");
   const [courseView, setCourseView] = useState(() => ["module", "lesson"].includes(initialRoute?.type) ? initialRoute.type : "catalog");
+  const [projectRoute, setProjectRoute] = useState(() => (isInitialProjectRoute ? initialRoute : null));
+  const [projects, setProjects] = useState(() => getProjects(auth.user?.id));
   const [activeModule, setActiveModule] = useState(initialModuleIndex);
   const [activeLesson, setActiveLesson] = useState(initialLessonIndex);
   const [query, setQuery] = useState("");
@@ -147,11 +159,20 @@ function App() {
         setPage("Übersicht");
         setEnteredCourse(false);
         setCourseView("catalog");
+        setProjectRoute(null);
         return;
       }
       if (route.type === "admin") {
         setPage("Admin");
         setEnteredCourse(true);
+        setProjectRoute(null);
+        return;
+      }
+      if (route.type === "dashboard" || ["project-new", "project", "project-edit"].includes(route.type)) {
+        setPage("Übersicht");
+        setEnteredCourse(true);
+        setProjectRoute(route);
+        setDrawer(null);
         return;
       }
 
@@ -159,12 +180,14 @@ function App() {
       const lessonIndex = modules[moduleIndex]?.lessons[route.lessonIndex] ? route.lessonIndex : 0;
       setPage("Classroom");
       setEnteredCourse(true);
+      setProjectRoute(null);
       setCourseView(route.type);
       setActiveModule(moduleIndex);
       setActiveLesson(lessonIndex);
       setDrawer(null);
     }
 
+    syncCourseRoute();
     window.addEventListener("hashchange", syncCourseRoute);
     window.addEventListener("popstate", syncCourseRoute);
     return () => {
@@ -176,6 +199,10 @@ function App() {
   useEffect(() => {
     if (auth.user) setAuthOpen(false);
   }, [auth.user]);
+
+  useEffect(() => {
+    setProjects(getProjects(auth.user?.id));
+  }, [auth.user?.id]);
 
   function updateHash(hash, replace = false) {
     if (window.location.hash === hash) return;
@@ -189,6 +216,48 @@ function App() {
     setCourseView("catalog");
     setDrawer(null);
     updateHash(classroomHash());
+    window.scrollTo({ top: 0, left: 0 });
+  }
+
+  function refreshProjects() {
+    setProjects(getProjects(auth.user?.id));
+  }
+
+  function openAuthorDashboard() {
+    refreshProjects();
+    setEnteredCourse(true);
+    setPage("Übersicht");
+    setProjectRoute({ type: "dashboard" });
+    setDrawer(null);
+    updateHash(dashboardHash());
+    window.scrollTo({ top: 0, left: 0 });
+  }
+
+  function openNewProject(stepIndex = 0) {
+    setEnteredCourse(true);
+    setPage("Übersicht");
+    setProjectRoute({ type: "project-new", stepIndex });
+    setDrawer(null);
+    updateHash(projectNewHash(stepIndex));
+    window.scrollTo({ top: 0, left: 0 });
+  }
+
+  function openProject(projectId) {
+    refreshProjects();
+    setEnteredCourse(true);
+    setPage("Übersicht");
+    setProjectRoute({ type: "project", projectId });
+    setDrawer(null);
+    updateHash(projectHash(projectId));
+    window.scrollTo({ top: 0, left: 0 });
+  }
+
+  function editProject(projectId, stepIndex = 0) {
+    setEnteredCourse(true);
+    setPage("Übersicht");
+    setProjectRoute({ type: "project-edit", projectId, stepIndex });
+    setDrawer(null);
+    updateHash(projectEditHash(projectId, stepIndex));
     window.scrollTo({ top: 0, left: 0 });
   }
 
@@ -226,6 +295,10 @@ function App() {
   function goToPage(nextPage) {
     if (nextPage === "Classroom") {
       openClassroom();
+      return;
+    }
+    if (nextPage === "Übersicht") {
+      openAuthorDashboard();
       return;
     }
     setEnteredCourse(true);
@@ -270,6 +343,11 @@ function App() {
     openLesson(nextLesson.moduleIndex, nextLesson.lessonIndex);
   }
 
+  const hashRoute = parseCourseHash(window.location.hash);
+  const activeProjectRoute = ["dashboard", "project-new", "project", "project-edit"].includes(hashRoute?.type)
+    ? hashRoute
+    : projectRoute;
+
   if (page === "Admin") {
     return (
       <>
@@ -287,7 +365,7 @@ function App() {
   if (page === "Übersicht" && !enteredCourse) {
     return (
       <>
-        <LandingPage onPreview={() => setPreviewOpen(true)} onMemberAccess={openMemberAccess} />
+        <LandingPage onPreview={openAuthorDashboard} onMemberAccess={openMemberAccess} />
         <CoursePreviewModal
           open={previewOpen}
           heroImage={watercolorHero}
@@ -304,7 +382,7 @@ function App() {
     );
   }
 
-  if (!auth.user) {
+  if (!auth.user && page !== "Übersicht" && !activeProjectRoute) {
     return (
       <>
         <MemberGate
@@ -314,6 +392,91 @@ function App() {
           onAuthOpen={() => setAuthOpen(true)}
         />
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} auth={auth} syncStatus={syncStatus} />
+      </>
+    );
+  }
+
+  if (page === "Übersicht" || activeProjectRoute) {
+    const userName = auth.profile?.display_name || "AutorMaster";
+    const visibleProjectRoute = activeProjectRoute || projectRoute;
+    if (visibleProjectRoute?.type === "project-new") {
+      return (
+        <>
+          <ProjectWizard
+            stepIndex={visibleProjectRoute.stepIndex || 0}
+            userId={auth.user?.id}
+            userName={userName}
+            onBack={openAuthorDashboard}
+            onStepChange={(stepIndex) => updateHash(projectNewHash(stepIndex), true)}
+            onFinished={(project) => {
+              refreshProjects();
+              openProject(project.id);
+            }}
+          />
+          {toast && <div className="toast">{toast}</div>}
+        </>
+      );
+    }
+    if (visibleProjectRoute?.type === "project-edit") {
+      const project = getProjectById(visibleProjectRoute.projectId);
+      if (!project) {
+        return (
+          <>
+            <ProjectOverviewPage
+              project={null}
+              userName={userName}
+              onBack={openAuthorDashboard}
+              onEdit={openAuthorDashboard}
+              onPrepared={openAuthorDashboard}
+            />
+            {toast && <div className="toast">{toast}</div>}
+          </>
+        );
+      }
+      return (
+        <>
+          <ProjectWizard
+            mode="edit"
+            project={project}
+            stepIndex={projectRoute.stepIndex || 0}
+            userId={auth.user?.id}
+            userName={userName}
+            onBack={() => openProject(visibleProjectRoute.projectId)}
+            onStepChange={(stepIndex) => updateHash(projectEditHash(visibleProjectRoute.projectId, stepIndex), true)}
+            onFinished={(saved) => {
+              refreshProjects();
+              openProject(saved.id);
+            }}
+          />
+          {toast && <div className="toast">{toast}</div>}
+        </>
+      );
+    }
+    if (visibleProjectRoute?.type === "project") {
+      const project = getProjectById(visibleProjectRoute.projectId);
+      return (
+        <>
+          <ProjectOverviewPage
+            project={project}
+            userName={userName}
+            onBack={openAuthorDashboard}
+            onEdit={() => editProject(visibleProjectRoute.projectId)}
+            onPrepared={() => notify("Dieser Arbeitsschritt ist vorbereitet und wird mit dem nächsten Backend-Ausbau aktiviert.")}
+          />
+          {toast && <div className="toast">{toast}</div>}
+        </>
+      );
+    }
+    return (
+      <>
+        <AuthorDashboard
+          projects={projects}
+          userName={userName}
+          onNewProject={() => openNewProject(0)}
+          onOpenProject={openProject}
+          onOpenClassroom={openClassroom}
+        />
+        {toast && <div className="toast">{toast}</div>}
       </>
     );
   }

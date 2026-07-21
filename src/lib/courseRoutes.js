@@ -3,7 +3,33 @@ export function parseCourseHash(hash) {
 
   const path = hash.replace(/^#\/?/, "").replace(/\/$/, "");
   if (!path) return null;
+  if (path === "dashboard") return { type: "dashboard" };
   if (path === "classroom") return { type: "catalog" };
+
+  const projectNewMatch = /^projects\/new(?:\/step-(\d+))?$/.exec(path);
+  if (projectNewMatch) {
+    return {
+      type: "project-new",
+      stepIndex: Math.max(0, Number(projectNewMatch[1] || 1) - 1),
+    };
+  }
+
+  const projectEditMatch = /^projects\/([^/]+)\/edit(?:\/step-(\d+))?$/.exec(path);
+  if (projectEditMatch) {
+    return {
+      type: "project-edit",
+      projectId: projectEditMatch[1],
+      stepIndex: Math.max(0, Number(projectEditMatch[2] || 1) - 1),
+    };
+  }
+
+  const projectMatch = /^projects\/([^/]+)$/.exec(path);
+  if (projectMatch) {
+    return {
+      type: "project",
+      projectId: projectMatch[1],
+    };
+  }
 
   const lessonMatch = /^classroom\/module\/(\d+)\/lesson\/(\d+)$/.exec(path);
   if (lessonMatch) {
@@ -27,6 +53,22 @@ export function parseCourseHash(hash) {
 }
 export function classroomHash() {
   return "#/classroom";
+}
+
+export function dashboardHash() {
+  return "#/dashboard";
+}
+
+export function projectNewHash(stepIndex = 0) {
+  return `#/projects/new/step-${stepIndex + 1}`;
+}
+
+export function projectHash(projectId) {
+  return `#/projects/${projectId}`;
+}
+
+export function projectEditHash(projectId, stepIndex = 0) {
+  return `#/projects/${projectId}/edit/step-${stepIndex + 1}`;
 }
 
 export function moduleHash(moduleNumber) {
