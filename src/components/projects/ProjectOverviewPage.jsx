@@ -24,7 +24,7 @@ function formatDate(value) {
   }
 }
 
-export function ProjectOverviewPage({ project, onBack, onEdit, onPrepared, userName }) {
+export function ProjectOverviewPage({ project, onBack, onEdit, onPrepared, onStageOpen, userName }) {
   if (!project) {
     return (
       <DashboardShell userName={userName}>
@@ -42,9 +42,15 @@ export function ProjectOverviewPage({ project, onBack, onEdit, onPrepared, userN
   }
 
   const subtitle = `${project.bookType || "Buchprojekt"}${project.targetAudience ? ` für ${project.targetAudience}` : ""}`;
+  const planningUnlocked = project.currentStage === "buchplanung" || (project.progress || 0) >= 14;
 
   return (
-    <DashboardShell userName={userName}>
+    <DashboardShell
+      userName={userName}
+      activeStage={planningUnlocked ? "buchplanung" : "dashboard"}
+      unlockedStages={planningUnlocked ? ["buchplanung"] : []}
+      onStageOpen={onStageOpen}
+    >
       <section className="project-overview-page">
         <button className="project-back" onClick={onBack}><ArrowLeft size={18} /> Zurück zum Dashboard</button>
         <header className="project-overview-head">
@@ -65,10 +71,13 @@ export function ProjectOverviewPage({ project, onBack, onEdit, onPrepared, userN
               <h2>Projektfortschritt</h2>
               <div className="project-road">
                 {journey.map((step, index) => (
-                  <div className={index === 0 ? "active" : ""} key={step}>
+                  <div className={index === 0 ? "done" : planningUnlocked && index === 1 ? "active" : ""} key={step}>
                     <span>{index === 0 ? <CheckCircle2 size={18} /> : index + 1}</span>
                     <strong>{step}</strong>
-                    {index > 0 && <em><Lock size={13} /> vorbereitet</em>}
+                    {index === 0 && <em>erledigt</em>}
+                    {planningUnlocked && index === 1 && <em>freigeschaltet</em>}
+                    {(!planningUnlocked && index > 0) && <em><Lock size={13} /> vorbereitet</em>}
+                    {(planningUnlocked && index > 1) && <em><Lock size={13} /> vorbereitet</em>}
                   </div>
                 ))}
               </div>

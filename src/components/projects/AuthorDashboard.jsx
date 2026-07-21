@@ -22,18 +22,18 @@ import {
 } from "lucide-react";
 
 const productionItems = [
-  ["Buchplanung", Lightbulb, true],
-  ["Figuren entwickeln", Users, true],
-  ["Kapitel schreiben", Sparkles, true],
-  ["Illustrationen", Image, true],
-  ["Cover gestalten", Palette, true],
-  ["Innenlayout", Layout, true],
-  ["Export & Prüfung", CloudUpload, true],
-  ["KDP Veröffentlichung", CloudUpload, true],
-  ["Marketing & Analyse", BarChart3, true],
+  ["buchplanung", "Buchplanung", Lightbulb],
+  ["figuren", "Figuren entwickeln", Users],
+  ["kapitel", "Kapitel schreiben", Sparkles],
+  ["illustrationen", "Illustrationen", Image],
+  ["cover", "Cover gestalten", Palette],
+  ["innenlayout", "Innenlayout", Layout],
+  ["export", "Export & Prüfung", CloudUpload],
+  ["kdp", "KDP Veröffentlichung", CloudUpload],
+  ["marketing", "Marketing & Analyse", BarChart3],
 ];
 
-function DashboardShell({ children, userName = "AutorMaster" }) {
+function DashboardShell({ children, userName = "AutorMaster", activeStage = "dashboard", unlockedStages = [], onStageOpen }) {
   return (
     <main className="author-shell" aria-label="KREA-MIX AutorMaster Dashboard">
       <aside className="author-sidebar">
@@ -42,18 +42,26 @@ function DashboardShell({ children, userName = "AutorMaster" }) {
           <span><strong>KREA-MIX</strong><small>Dein Weg zum Bestseller.</small></span>
         </button>
         <nav className="author-nav" aria-label="AutorMaster Navigation">
-          <button className="active"><Grid2X2 size={20} />Dashboard</button>
+          <button className={activeStage === "dashboard" ? "active" : ""}><Grid2X2 size={20} />Dashboard</button>
           <span>Projekte</span>
           <button><Folder size={20} />Projekte</button>
           <button><BookOpen size={20} />Bibliothek</button>
           <span>Produktionsstrasse</span>
-          {productionItems.map(([label, Icon, locked]) => (
-            <button key={label}>
-              <Icon size={19} />
-              {label}
-              {locked && <Lock className="author-lock" size={14} />}
-            </button>
-          ))}
+          {productionItems.map(([stage, label, Icon]) => {
+            const unlocked = unlockedStages.includes(stage);
+            return (
+              <button
+                className={`${activeStage === stage ? "active-stage" : ""} ${unlocked ? "unlocked" : "locked"}`}
+                disabled={!unlocked}
+                key={stage}
+                onClick={() => unlocked && onStageOpen?.(stage)}
+              >
+                <Icon size={19} />
+                {label}
+                {!unlocked && <Lock className="author-lock" size={14} />}
+              </button>
+            );
+          })}
         </nav>
         <div className="author-sidebar-footer">
           <div className="author-user">

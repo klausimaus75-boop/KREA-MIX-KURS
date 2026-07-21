@@ -60,9 +60,10 @@ import {
   parseCourseHash,
   projectEditHash,
   projectHash,
+  projectPlanningHash,
   projectNewHash,
 } from "./lib/courseRoutes";
-import { getProjectById, getProjects } from "./lib/projectStore";
+import { getProjectById, getProjects, updateProject } from "./lib/projectStore";
 import { BookProjectCard } from "./components/course/BookProjectCard";
 import { ClassroomCatalog } from "./components/course/ClassroomCatalog";
 import { LessonPage } from "./components/course/LessonPage";
@@ -75,6 +76,7 @@ import { AccountAvatar, AuthModal } from "./components/auth/AuthModal";
 import { CoursePreviewModal } from "./components/preview/CoursePreviewModal";
 import { AuthorDashboard } from "./components/projects/AuthorDashboard";
 import { ProjectOverviewPage } from "./components/projects/ProjectOverviewPage";
+import { ProjectPlanningPage } from "./components/projects/ProjectPlanningPage";
 import { ProjectWizard } from "./components/projects/ProjectWizard";
 import { useAuth } from "./hooks/useAuth";
 import { useCourseProgress } from "./hooks/useCourseProgress";
@@ -110,7 +112,7 @@ function App() {
   const auth = useAuth();
   const { completedLessons, completeLesson, syncStatus, syncError } = useCourseProgress(auth.user);
   const isInitialCourseRoute = ["catalog", "module", "lesson"].includes(initialRoute?.type);
-  const isInitialProjectRoute = ["dashboard", "project-new", "project", "project-edit"].includes(initialRoute?.type);
+  const isInitialProjectRoute = ["dashboard", "project-new", "project", "project-edit", "project-planning"].includes(initialRoute?.type);
   const [page, setPage] = useState(() => initialRoute?.type === "admin" ? "Admin" : initialRoute ? "Classroom" : "Übersicht");
   const [courseView, setCourseView] = useState(() => ["module", "lesson"].includes(initialRoute?.type) ? initialRoute.type : "catalog");
   const [projectRoute, setProjectRoute] = useState(() => (isInitialProjectRoute ? initialRoute : null));
@@ -168,7 +170,7 @@ function App() {
         setProjectRoute(null);
         return;
       }
-      if (route.type === "dashboard" || ["project-new", "project", "project-edit"].includes(route.type)) {
+      if (route.type === "dashboard" || ["project-new", "project", "project-edit", "project-planning"].includes(route.type)) {
         setPage("Übersicht");
         setEnteredCourse(true);
         setProjectRoute(route);
@@ -261,6 +263,23 @@ function App() {
     window.scrollTo({ top: 0, left: 0 });
   }
 
+  function openProjectPlanning(projectId) {
+    const project = getProjectById(projectId);
+    if (project && project.currentStage !== "buchplanung") {
+      updateProject(projectId, {
+        currentStage: "buchplanung",
+        progress: Math.max(project.progress || 0, 14),
+      });
+      refreshProjects();
+    }
+    setEnteredCourse(true);
+    setPage("Übersicht");
+    setProjectRoute({ type: "project-planning", projectId });
+    setDrawer(null);
+    updateHash(projectPlanningHash(projectId));
+    window.scrollTo({ top: 0, left: 0 });
+  }
+
   function openModule(moduleIndex) {
     const selectedModule = modules[moduleIndex] || modules[0];
     setEnteredCourse(true);
@@ -344,7 +363,7 @@ function App() {
   }
 
   const hashRoute = parseCourseHash(window.location.hash);
-  const activeProjectRoute = ["dashboard", "project-new", "project", "project-edit"].includes(hashRoute?.type)
+  const activeProjectRoute = ["dashboard", "project-new", "project", "project-edit", "project-planning"].includes(hashRoute?.type)
     ? hashRoute
     : projectRoute;
 
@@ -438,7 +457,7 @@ function App() {
           <ProjectWizard
             mode="edit"
             project={project}
-            stepIndex={projectRoute.stepIndex || 0}
+            stepIndex={visibleProjectRoute.stepIndex || 0}
             userId={auth.user?.id}
             userName={userName}
             onBack={() => openProject(visibleProjectRoute.projectId)}
@@ -461,7 +480,32 @@ function App() {
             userName={userName}
             onBack={openAuthorDashboard}
             onEdit={() => editProject(visibleProjectRoute.projectId)}
-            onPrepared={() => notify("Dieser Arbeitsschritt ist vorbereitet und wird mit dem nächsten Backend-Ausbau aktiviert.")}
+            onPrepared={() => openProjectPlanning(visibleProjectRoute.projectId)}
+            onStageOpen={(stage) => {
+              if (stage === "buchplanung") openProjectPlanning(visibleProjectRoute.projectId);
+            }}
+          />
+          {toast && <div className="toast">{toast}</div>}
+        </>
+      );
+    }
+    if (visibleProjectRoute?.type === "project-planning") {
+      const project = getProjectById(visibleProjectRoute.projectId);
+      return (
+        <>
+          <ProjectPlanningPage
+            project={project}
+            userName={userName}
+            onBack={openAuthorDashboard}
+            onProject={() => openProject(visibleProjectRoute.projectId)}
+            onSaved={(saved) => {
+              refreshProjects();
+              notify("Buchplanung gespeichert.");
+              openProjectPlanning(saved.id);
+            }}
+            onStageOpen={(stage) => {
+              if (stage === "buchplanung") openProjectPlanning(visibleProjectRoute.projectId);
+            }}
           />
           {toast && <div className="toast">{toast}</div>}
         </>

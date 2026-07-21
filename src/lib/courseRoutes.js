@@ -23,6 +23,14 @@ export function parseCourseHash(hash) {
     };
   }
 
+  const projectPlanningMatch = /^projects\/([^/]+)\/planning$/.exec(path);
+  if (projectPlanningMatch) {
+    return {
+      type: "project-planning",
+      projectId: projectPlanningMatch[1],
+    };
+  }
+
   const projectMatch = /^projects\/([^/]+)$/.exec(path);
   if (projectMatch) {
     return {
@@ -69,6 +77,10 @@ export function projectHash(projectId) {
 
 export function projectEditHash(projectId, stepIndex = 0) {
   return `#/projects/${projectId}/edit/step-${stepIndex + 1}`;
+}
+
+export function projectPlanningHash(projectId) {
+  return `#/projects/${projectId}/planning`;
 }
 
 export function moduleHash(moduleNumber) {

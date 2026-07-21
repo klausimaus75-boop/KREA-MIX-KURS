@@ -10,6 +10,10 @@ const futureProjectFields = {
   price: "",
   kdpStatus: "Nicht gestartet",
   marketingStatus: "Nicht gestartet",
+  ideaOneLiner: "",
+  promise: "",
+  audienceProblem: "",
+  planningNotes: "",
 };
 
 export const emptyProjectDraft = {

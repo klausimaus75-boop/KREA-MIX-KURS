@@ -5224,6 +5224,22 @@ nav button.active svg,
   font-weight: 750;
 }
 
+.author-nav button.unlocked {
+  color: #182250;
+}
+
+.author-nav button.active-stage {
+  color: var(--author-primary);
+  background: linear-gradient(90deg, #eeedff, #ffffff);
+  box-shadow: inset 3px 0 0 var(--author-primary);
+  font-weight: 800;
+}
+
+.author-nav button.locked {
+  opacity: .72;
+  cursor: not-allowed;
+}
+
 .author-lock {
   color: #697393;
 }
@@ -5471,7 +5487,8 @@ nav button.active svg,
 }
 
 .author-journey .active span,
-.project-road .active span {
+.project-road .active span,
+.project-road .done span {
   color: #fff;
   background: linear-gradient(135deg, #2722e9, #6358ff);
   box-shadow: 0 11px 20px rgba(61, 50, 245, .25);
@@ -6241,16 +6258,196 @@ nav button.active svg,
   min-height: 420px;
 }
 
+.project-planning-page {
+  padding: 32px clamp(28px, 3vw, 42px) 42px;
+}
+
+.planning-hero {
+  margin-bottom: 24px;
+  padding: clamp(26px, 3vw, 38px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #2115d8, #4b3dff);
+  box-shadow: 0 18px 38px rgba(61, 50, 245, .2);
+}
+
+.planning-hero span {
+  color: rgba(255, 255, 255, .78);
+  font-size: 13px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.planning-hero h1 {
+  margin: 8px 0;
+  color: #fff;
+  font-size: clamp(30px, 3vw, 46px);
+  font-weight: 850;
+  line-height: 1.08;
+}
+
+.planning-hero p {
+  max-width: 760px;
+  margin: 0;
+  color: rgba(255, 255, 255, .86);
+  line-height: 1.65;
+}
+
+.planning-hero .author-primary {
+  color: var(--author-primary);
+  background: #fff;
+  box-shadow: none;
+}
+
+.planning-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+}
+
+.planning-main-card,
+.planning-side .author-card {
+  border: 1px solid var(--author-line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(26, 34, 76, .055);
+}
+
+.planning-main-card {
+  padding: clamp(24px, 3vw, 36px);
+  display: grid;
+  gap: 18px;
+}
+
+.planning-step-heading {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.planning-step-heading svg,
+.planning-side .author-card > svg {
+  color: var(--author-primary);
+}
+
+.planning-step-heading h2,
+.planning-side h2 {
+  margin: 0 0 6px;
+  color: var(--author-text);
+  font-size: 22px;
+}
+
+.planning-step-heading p {
+  margin: 0;
+  color: #536080;
+  line-height: 1.55;
+}
+
+.planning-field {
+  display: grid;
+  gap: 9px;
+}
+
+.planning-field span {
+  color: var(--author-text);
+  font-weight: 800;
+}
+
+.planning-field textarea {
+  min-height: 112px;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--author-line);
+  border-radius: 10px;
+  color: var(--author-text);
+  background: #fbfcff;
+  resize: vertical;
+}
+
+.planning-side {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+.planning-checklist {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.planning-checklist li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  color: #364266;
+  line-height: 1.45;
+}
+
+.planning-checklist svg {
+  color: #39c980;
+  flex: 0 0 auto;
+}
+
+.planning-facts {
+  margin: 16px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.planning-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #edf0f8;
+}
+
+.planning-facts dt {
+  color: #717b9b;
+  font-weight: 700;
+}
+
+.planning-facts dd {
+  margin: 0;
+  color: var(--author-text);
+  font-weight: 800;
+  text-align: right;
+}
+
+.planning-next {
+  min-height: 52px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  background: var(--author-primary);
+  box-shadow: 0 13px 26px rgba(61, 50, 245, .22);
+  font-weight: 850;
+}
+
 @media (max-width: 1180px) {
   .author-shell {
     grid-template-columns: 250px minmax(0, 1fr);
   }
   .author-dashboard,
-  .project-overview-grid {
+  .project-overview-grid,
+  .planning-grid {
     grid-template-columns: minmax(0, 1fr);
   }
   .author-rail,
-  .project-side {
+  .project-side,
+  .planning-side {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -6334,6 +6531,7 @@ nav button.active svg,
   }
   .author-rail,
   .project-side,
+  .planning-grid,
   .author-project-grid,
   .wizard-grid.two,
   .wizard-grid.book-types,
@@ -6354,6 +6552,9 @@ nav button.active svg,
   }
   .project-overview-actions {
     flex-wrap: wrap;
+  }
+  .planning-hero {
+    grid-template-columns: minmax(0, 1fr);
   }
   .project-road {
     grid-template-columns: repeat(2, minmax(0, 1fr));
