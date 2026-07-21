@@ -33,7 +33,16 @@ const productionItems = [
   ["marketing", "Marketing & Analyse", BarChart3],
 ];
 
-function DashboardShell({ children, userName = "AutorMaster", activeStage = "dashboard", unlockedStages = [], onStageOpen }) {
+function getProductionItems(bookType) {
+  if (bookType === "Malbuch") {
+    return productionItems.filter(([stage]) => stage !== "kapitel");
+  }
+  return productionItems;
+}
+
+function DashboardShell({ children, userName = "AutorMaster", activeStage = "dashboard", unlockedStages = [], onStageOpen, bookType }) {
+  const visibleProductionItems = getProductionItems(bookType);
+
   return (
     <main className="author-shell" aria-label="KREA-MIX AutorMaster Dashboard">
       <aside className="author-sidebar">
@@ -47,7 +56,7 @@ function DashboardShell({ children, userName = "AutorMaster", activeStage = "das
           <button><Folder size={20} />Projekte</button>
           <button><BookOpen size={20} />Bibliothek</button>
           <span>Produktionsstrasse</span>
-          {productionItems.map(([stage, label, Icon]) => {
+          {visibleProductionItems.map(([stage, label, Icon]) => {
             const unlocked = unlockedStages.includes(stage);
             return (
               <button

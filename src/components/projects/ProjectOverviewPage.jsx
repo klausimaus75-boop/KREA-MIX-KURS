@@ -50,6 +50,7 @@ export function ProjectOverviewPage({ project, onBack, onEdit, onPrepared, onSta
       activeStage={planningUnlocked ? "buchplanung" : "dashboard"}
       unlockedStages={planningUnlocked ? ["buchplanung"] : []}
       onStageOpen={onStageOpen}
+      bookType={project.bookType}
     >
       <section className="project-overview-page">
         <button className="project-back" onClick={onBack}><ArrowLeft size={18} /> Zurück zum Dashboard</button>

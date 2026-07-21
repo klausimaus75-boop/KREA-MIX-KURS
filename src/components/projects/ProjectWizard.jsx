@@ -160,7 +160,7 @@ export function ProjectWizard({ mode = "create", project, stepIndex = 0, userId,
   }
 
   return (
-    <DashboardShell userName={userName}>
+    <DashboardShell userName={userName} bookType={draft.bookType}>
       <section className="project-wizard-page">
         <button className="project-back" onClick={onBack}><ArrowLeft size={18} /> Zurück zum Dashboard</button>
         <div className="project-wizard-head">

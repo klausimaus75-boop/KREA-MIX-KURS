@@ -54,6 +54,7 @@ export function ProjectPlanningPage({ project, userName, onBack, onProject, onSa
       activeStage="buchplanung"
       unlockedStages={["buchplanung"]}
       onStageOpen={onStageOpen}
+      bookType={project.bookType}
     >
       <section className="project-planning-page">
         <button className="project-back" onClick={onProject}><ArrowLeft size={18} /> Zurück zum Projekt</button>
